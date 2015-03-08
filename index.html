@@ -11,7 +11,7 @@
 	var worker = new Worker("manager.js");
 	
 	worker.onmessage = function(e){
-	    document.getElementById("outputTarget").innerHTML= e.data;
+	    document.getElementById("outputTarget").innerHTML= e.data;//document.getElementById("outputTarget").innerHTML+"<br /><br />"+e.data;
 	};
 	
 	worker.postMessage("start");

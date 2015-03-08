@@ -23,13 +23,12 @@ Builder.run = function(id,world,origin,goal)
     while (true)
     {
 	i++;
-	builder.step();
 	if (Builder.goalTest(builder.currentNode.state,builder.goal))
 	  break;
+	builder.step();
     } 
     builder.summary(builder.currentNode,i);
     return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
-    //Builder.output(b.world,b.currentNode);
 }
 
 Builder.createCandidate = function(currentNode,closedList)
@@ -41,7 +40,7 @@ Builder.createCandidate = function(currentNode,closedList)
 	actions.push(n.action);
 	n = n.parent;
     }
-    return actions;
+    return actions.reverse();
 }
 
 Builder.prototype.step = function()
@@ -185,7 +184,7 @@ Builder.buildUp = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,4);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,4);
 	}
     return null;
 }
@@ -199,7 +198,7 @@ Builder.buildRight = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x+1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,5);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,5);
 	}
     return null;
 }
@@ -213,7 +212,7 @@ Builder.buildDown = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,6);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,6);
 	}
     return null;
 }
@@ -227,7 +226,7 @@ Builder.buildLeft = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x-1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,7);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,7);
 	}
     return null;
 }

@@ -13,7 +13,9 @@ function Agent(id,origin,goal)
     this.candidate = null;
     
     this.origin = origin;
-    this.position = this.origin;
+    this.position = origin;
+    console.log(origin);
+    console.log(goal);
     this.goal = goal;
 }
 
@@ -31,16 +33,23 @@ function Manager()
 Manager.run = function()
 {
     var m = new Manager();
-    var builder,origin,goal;
+    var builder;
+    var origin;
+    var goal;
     for (var i=0;i<m.agents.length;i++)
     {
-	m.agents[i] = new Agent(i,{x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))},{x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))});
+	origin = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
+	m.world[origin.x][origin.y]=3;
+	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
+	m.world[goal.x][goal.y] = 4;
+	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner.onmessage = function(e){
 	    if (e.data.msg === "candidate")
 		m.gotCandidate(e.data.id,e.data.candidate);
 	    };
 	m.agents[i].plan(m.world);
     }
+    postMessage(Manager.output(m.world));
 }
 
 Manager.prototype.rePlanAgents = function()
@@ -64,7 +73,7 @@ Manager.createWorld = function(width,height)
     world.push([]);
     for (var j=0;j<width;j++)
     {
-      world[i][j] = Math.round(Math.random()*0.75);
+      world[i][j] = Math.round(Math.random()*0.7);
     }
   }
   
@@ -105,14 +114,19 @@ Manager.worldState = function(world,modifications,x,y)
 Manager.prototype.runAgents = function()
 {
   var firstToFail = -1;
-    for (var a=0;a<1000;a++)
+  var max = 1;
+    for (var a=0;a<max;a++)
 	for (var i=0;i<this.agents.length;i++)
 	  if (this.agents[i].candidate != null)
+	  {
+	      if (this.agents[i].candidate.length > max)
+		max = this.agents[i].candidate.length;
 	      if (this.agents[i].candidate.length-1 >= a)
 	      {
 		  if (!this.action(this.agents[i].candidate[a],i))
 		    firstToFail = i;
 	      }
+	  }
  
     if (firstToFail != -1)
     {
@@ -163,15 +177,15 @@ Manager.prototype.action = function(actionID,agentID)
       else
 	  return false;
       break;
-    case 5:
+    case 6:
       if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1]))
 	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1] = 2;
       else
 	  return false;
       break;
-    case 5:
-      if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
-	  this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
+    case 7:
+      if (Manager.buildable(this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y]))
+	  this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y] = 2;
       else
 	  return false;
       break;
@@ -189,11 +203,11 @@ Manager.output = function(world)
 {
     var html = "";
 
-    for (var i=0;i<world.length;i++)
+    for (var i=0;i<world[0].length;i++)
     {
-	for (var j=0;j<world[0].length;j++)
+	for (var j=0;j<world.length;j++)
 	{
-	    switch (world[i][j])
+	    switch (world[j][i])
 	    {
 	      case 0:
 		html += "&nbsp;";
@@ -203,6 +217,12 @@ Manager.output = function(world)
 		break;
 	      case 2:
 		html += "█";
+		break;
+	      case 3:
+		html += "S";
+		break;
+	      case 4:
+		html += "E";
 		break;
 	    }
 	}
