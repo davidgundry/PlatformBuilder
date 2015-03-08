@@ -2,33 +2,32 @@ var debug = false;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    postMessage(Builder.run(e.data.id,e.data.world));
+    postMessage(Builder.run(e.data.id,e.data.world,e.data.origin,e.data.goal));
   }
 };
 
-function Builder(id,world)
+function Builder(world,origin,goal)
 {
-  this.id = id;
   this.world = world;
-  this.goal = {x:this.world.length-1,y:this.world[0].length-1};
+  this.goal = goal;
 
-  this.fringe = [new Builder.Node({p:{x:0,y:0},m:[]},0)];
+  this.fringe = [new Builder.Node({p:origin,m:[]},0)];
   this.candidate = this.fringe[0];
 }
 
-Builder.run = function(id,world)
+Builder.run = function(id,world,origin,goal)
 {
-    var b = new Builder(id,world);
+    var builder = new Builder(world,origin,goal);
     var i=0;
     while (true)
     {
 	i++;
-	b.step();
-	if (Builder.goalTest(b.candidate.state,b.goal))
+	builder.step();
+	if (Builder.goalTest(builder.candidate.state,builder.goal))
 	  break;
     } 
-    b.summary(b.candidate,i);
-    return {id:id,msg:"candidate",candidate:b.candidate};
+    builder.summary(builder.candidate,i);
+    return {id:id,msg:"candidate",candidate:builder.candidate};
     //Builder.output(b.world,b.candidate);
 }
 
@@ -104,20 +103,20 @@ Builder.heuristic = function(state,goal)
     return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
 }
 
-Builder.worldState = function(world,modifications,x,y)
+Builder.walkable = function(world,modifications,x,y)
 {
   for (var i=0;i<modifications.length;i++)
   {
       if ((modifications[i][0] == x) && (modifications[i][1] == y))
 	return true;
   }
-  return world[x][y];
+  return world[x][y]==1;
 }
 
 Builder.moveRight = function(node,world)
 {
     if (node.state.p.x < world.length-1)
-	if (Builder.worldState(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var p = {x:node.state.p.x+1,y:node.state.p.y};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
@@ -128,7 +127,7 @@ Builder.moveRight = function(node,world)
 Builder.moveLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (Builder.worldState(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
 	{
 	  var p = {x:node.state.p.x-1,y:node.state.p.y};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
@@ -139,7 +138,7 @@ Builder.moveLeft = function(node,world)
 Builder.moveUp = function(node,world)
 {
     if (node.state.p.y > 0)
-	if (Builder.worldState(world,node.state.m,node.state.p.x,node.state.p.y-1))
+	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1))
 	{
 	  var p = {x:node.state.p.x,y:node.state.p.y-1};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
@@ -150,7 +149,7 @@ Builder.moveUp = function(node,world)
 Builder.moveDown = function(node,world)
 {
     if (node.state.p.y < world[0].length-1)
-	if (Builder.worldState(world,node.state.m,node.state.p.x,node.state.p.y+1))
+	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var p = {x:node.state.p.x,y:(node.state.p.y+1)};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
@@ -162,7 +161,7 @@ Builder.moveDown = function(node,world)
 Builder.buildRight = function(node,world)
 {
     if (node.state.p.x < world.length-1)
-	if (!Builder.worldState(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -176,7 +175,7 @@ Builder.buildRight = function(node,world)
 Builder.buildLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (!Builder.worldState(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -190,7 +189,7 @@ Builder.buildLeft = function(node,world)
 Builder.buildUp = function(node,world)
 {
     if (node.state.p.y > 0)
-	if (!Builder.worldState(world,node.state.m,node.state.p.x,node.state.p.y-1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -204,7 +203,7 @@ Builder.buildUp = function(node,world)
 Builder.buildDown = function(node,world)
 {
     if (node.state.p.y < world[0].length-1)
-	if (!Builder.worldState(world,node.state.m,node.state.p.x,node.state.p.y+1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
