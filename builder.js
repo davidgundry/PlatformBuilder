@@ -129,7 +129,7 @@ Builder.walkable = function(world,modifications,x,y)
       if ((modifications[i][0] == x) && (modifications[i][1] == y))
 	return true;
   }
-  return world[x][y]==1;
+  return (!world[x][y]==0);
 }
 
 Builder.moveUp = function(node,world)
@@ -145,7 +145,7 @@ Builder.moveUp = function(node,world)
 
 Builder.moveRight = function(node,world)
 {
-    if (node.state.p.x < world.length-1)
+    if (node.state.p.x < world.length-2)
 	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var p = {x:node.state.p.x+1,y:node.state.p.y};
@@ -156,7 +156,7 @@ Builder.moveRight = function(node,world)
 
 Builder.moveDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-1)
+    if (node.state.p.y < world[0].length-2)
 	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var p = {x:node.state.p.x,y:(node.state.p.y+1)};
@@ -192,7 +192,7 @@ Builder.buildUp = function(node,world)
 
 Builder.buildRight = function(node,world)
 {
-    if (node.state.p.x < world.length-1)
+    if (node.state.p.x < world.length-2)
 	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var n = [];
@@ -206,7 +206,7 @@ Builder.buildRight = function(node,world)
 
 Builder.buildDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-1)
+    if (node.state.p.y < world[0].length-2)
 	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var n = [];

@@ -43,19 +43,17 @@ Manager.run = function()
     }
 }
 
-Manager.prototype.startNullCandidates = function()
+Manager.prototype.rePlanAgents = function()
 {
-    var n=0;
     for (var i=0;i<this.agents.length;i++)
     {
-	if (this.agents[i] == null)
+	if (this.agents[i].candidate == null)
 	{
 	  this.agents[i].plan(this.world);
-	  n++;
+	  if (debug)
+	      console.log("Started replanning agent "+i);
 	}
     }
-    if (debug)
-      console.log("Started "+n+" agent planners");
 }
 
 Manager.createWorld = function(width,height)
@@ -66,7 +64,7 @@ Manager.createWorld = function(width,height)
     world.push([]);
     for (var j=0;j<width;j++)
     {
-      world[i][j] = Math.round(Math.random());
+      world[i][j] = Math.round(Math.random()*0.75);
     }
   }
   
@@ -91,7 +89,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate)
 	}
 	
     if (finished)
-	this.runCandidates();
+	this.runAgents();
 }
 
 Manager.worldState = function(world,modifications,x,y)
@@ -104,7 +102,7 @@ Manager.worldState = function(world,modifications,x,y)
   return world[x][y];
 }
 
-Manager.prototype.runCandidates = function()
+Manager.prototype.runAgents = function()
 {
   var firstToFail = -1;
     for (var a=0;a<1000;a++)
@@ -118,8 +116,9 @@ Manager.prototype.runCandidates = function()
  
     if (firstToFail != -1)
     {
-      this.candidates[failedCandidate] = null;
-      this.startNullCandidates();
+      postMessage(Manager.output(this.world));
+      this.agents[firstToFail].candidate = null;
+      this.rePlanAgents();
     }
     else
     {
@@ -127,6 +126,13 @@ Manager.prototype.runCandidates = function()
 	  console.log("Returning final output");
 	postMessage(Manager.output(this.world));
     }
+}
+
+Manager.buildable = function(tile)
+{
+    if (tile ==0)
+      return true;
+    return false;
 }
 
 Manager.prototype.action = function(actionID,agentID)
@@ -146,16 +152,28 @@ Manager.prototype.action = function(actionID,agentID)
       this.agents[agentID].position.x--;
       break;
     case 4:
-      this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1] = 2;
+      if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1]))
+	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1] = 2;
+      else
+	  return false;
       break;
     case 5:
-      this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
+      if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
+	  this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
+      else
+	  return false;
       break;
     case 5:
-      this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1] = 2;
+      if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1]))
+	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1] = 2;
+      else
+	  return false;
       break;
     case 5:
-      this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y] = 2;
+      if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
+	  this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
+      else
+	  return false;
       break;
   }
   return true;
