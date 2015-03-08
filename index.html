@@ -11,7 +11,7 @@
 	var worker = new Worker("builder.js");
 	
 	worker.onmessage = function(e){
-	  document.getElementById("outputTarget").innerHTML= e.data;
+	    document.getElementById("outputTarget").innerHTML= e.data;
 	};
 	
 	worker.postMessage("start");

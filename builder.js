@@ -1,3 +1,11 @@
+var debug = false;	
+
+onmessage = function(e){
+  if ( e.data === "start" ) {
+    postMessage(Builder.run());
+  }
+};
+
 function Builder(width,height)
 {
   this.world = Builder.createWorld(width,height);
@@ -7,6 +15,20 @@ function Builder(width,height)
   this.candidate = this.fringe[0];
 }
 
+Builder.run = function()
+{
+    var b = new Builder(1000,1000);
+    var i=0;
+    while (true)
+    {
+	i++;
+	b.step();
+	if (Builder.goalTest(b.candidate.state,b.goal))
+	  break;
+    } 
+    b.summary(b.candidate,i);
+    return Builder.output(b.world,b.candidate);
+}
 
 Builder.prototype.step = function()
 {
@@ -243,32 +265,3 @@ Builder.output = function(world,solution)
   }
   return html;
 }
-
-
-var debug = false;	
-
-onmessage = function(e){
-  if ( e.data === "start" ) {
-    postMessage(run());
-  }
-};
-
-function run()
-{
-    var b = new Builder(1000,1000);
-    var i=0;
-    while (true)
-    {
-	i++;
-	b.step();
-	if (Builder.goalTest(b.candidate.state,b.goal))
-	  break;
-    } 
-    b.summary(b.candidate,i);
-    return Builder.output(b.world,b.candidate);
-}
-
-
-
-
-
