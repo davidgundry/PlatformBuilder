@@ -11,8 +11,9 @@ function Builder(world,origin,goal)
   this.world = world;
   this.goal = goal;
 
-  this.fringe = [new Builder.Node({p:origin,m:[]},0)];
-  this.candidate = this.fringe[0];
+  this.fringe = [new Builder.Node({p:origin,m:[]},0,null)];
+  this.closedList = [];
+  this.currentNode = this.fringe[0];
 }
 
 Builder.run = function(id,world,origin,goal)
@@ -23,12 +24,24 @@ Builder.run = function(id,world,origin,goal)
     {
 	i++;
 	builder.step();
-	if (Builder.goalTest(builder.candidate.state,builder.goal))
+	if (Builder.goalTest(builder.currentNode.state,builder.goal))
 	  break;
     } 
-    builder.summary(builder.candidate,i);
-    return {id:id,msg:"candidate",candidate:builder.candidate};
-    //Builder.output(b.world,b.candidate);
+    builder.summary(builder.currentNode,i);
+    return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
+    //Builder.output(b.world,b.currentNode);
+}
+
+Builder.createCandidate = function(currentNode,closedList)
+{
+    var actions = [];
+    var n = currentNode;
+    while (n != null)
+    {
+	actions.push(n.action);
+	n = n.parent;
+    }
+    return actions;
 }
 
 Builder.prototype.step = function()
@@ -36,20 +49,24 @@ Builder.prototype.step = function()
     if (debug)
 	console.log("Fringe length: "+this.fringe.length);
     
-    if (this.candidate != null)
+    if (this.currentNode != null)
     {
 	if (debug)
 	{
-	    console.log(this.candidate.state.p);
-	    console.log(this.candidate.heuristic);
-	    console.log("m length:"+this.candidate.state.m.length);
+	    console.log(this.currentNode.state.p);
+	    console.log(this.currentNode.heuristic);
+	    console.log("m length:"+this.currentNode.state.m.length);
 	}
-	this.fringe.splice(this.fringe.indexOf(this.candidate),1);
-	var newNodes = Builder.expand(this.candidate,Builder.actions,this.goal,this.world);
+	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
+	this.closedList.push(this.currentNode);
+	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
 	for (var i=0;i<newNodes.length;i++)
+	{
 	  newNodes[i].heuristic = Builder.heuristic(newNodes[i].state,this.goal);
+	  newNodes[i].parent = this.closedList[this.closedList.length-1];
+	}
 	this.fringe = Builder.sort(this.fringe.concat(newNodes));
-	this.candidate = this.fringe[0];
+	this.currentNode = this.fringe[0];
     }
 }
 
@@ -88,13 +105,15 @@ Builder.goalTest = function(state,goal)
   return ((state.p.x==goal.x) && (state.p.y==goal.y));
 }
 
-Builder.Node = function(state,cost)
+Builder.Node = function(state,cost,action)
 {
     this.state = state;
     this.cost = cost;
+    this.action = action;
 }
 
 Builder.Node.prototype.heuristic = 0;
+Builder.Node.prototype.parent = null;
 
 Builder.heuristic = function(state,goal)
 {
@@ -113,35 +132,24 @@ Builder.walkable = function(world,modifications,x,y)
   return world[x][y]==1;
 }
 
-Builder.moveRight = function(node,world)
-{
-    if (node.state.p.x < world.length-1)
-	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
-	{
-	  var p = {x:node.state.p.x+1,y:node.state.p.y};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
-	}
-    return null;
-}
-
-Builder.moveLeft = function(node,world)
-{
-    if (node.state.p.x > 0)
-	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
-	{
-	  var p = {x:node.state.p.x-1,y:node.state.p.y};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
-	}
-    return null;
-}
-
 Builder.moveUp = function(node,world)
 {
     if (node.state.p.y > 0)
 	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1))
 	{
 	  var p = {x:node.state.p.x,y:node.state.p.y-1};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
+	}
+    return null;
+}
+
+Builder.moveRight = function(node,world)
+{
+    if (node.state.p.x < world.length-1)
+	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	{
+	  var p = {x:node.state.p.x+1,y:node.state.p.y};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
 	}
     return null;
 }
@@ -152,36 +160,18 @@ Builder.moveDown = function(node,world)
 	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var p = {x:node.state.p.x,y:(node.state.p.y+1)};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1);
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
 	}
     return null;
 }
 
-
-Builder.buildRight = function(node,world)
-{
-    if (node.state.p.x < world.length-1)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x+1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20);
-	}
-    return null;
-}
-
-Builder.buildLeft = function(node,world)
+Builder.moveLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
 	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x-1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20);
+	  var p = {x:node.state.p.x-1,y:node.state.p.y};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
 	}
     return null;
 }
@@ -195,7 +185,21 @@ Builder.buildUp = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,4);
+	}
+    return null;
+}
+
+Builder.buildRight = function(node,world)
+{
+    if (node.state.p.x < world.length-1)
+	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	{
+	  var n = [];
+	  for (var i=0;i<node.state.m.length;i++)
+	    n.push(node.state.m[i]);
+	  n.push([node.state.p.x+1,node.state.p.y]);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,5);
 	}
     return null;
 }
@@ -209,12 +213,39 @@ Builder.buildDown = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+20);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,6);
 	}
     return null;
 }
 
+Builder.buildLeft = function(node,world)
+{
+    if (node.state.p.x > 0)
+	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	{
+	  var n = [];
+	  for (var i=0;i<node.state.m.length;i++)
+	    n.push(node.state.m[i]);
+	  n.push([node.state.p.x-1,node.state.p.y]);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+20,7);
+	}
+    return null;
+}
+
+
+/**
+ * moveUp = 0
+ * moveRight = 1
+ * moveDown = 2
+ * moveLeft = 3
+ * buildUp = 4
+ * buildRight = 5
+ * buildDown = 6
+ * buildLeft = 7
+ */
 Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown];
+
+
 
 Builder.prototype.summary = function(solution,steps)
 {
@@ -228,4 +259,5 @@ Builder.prototype.summary = function(solution,steps)
     console.log("Failure");
 
   console.log("Fringe length: "+ this.fringe.length);
+  console.log("Closed list length: "+ this.closedList.length);
 }
