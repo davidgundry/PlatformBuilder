@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Builder</title>
+  </head>
+
+  <body>
+  <div style="font-family:mono" id="outputTarget"></div>
+    <script type="text/javascript">
+	var worker = new Worker("builder.js");
+	
+	worker.onmessage = function(e){
+	  document.getElementById("outputTarget").innerHTML= e.data;
+	};
+	
+	worker.postMessage("start");
+    </script>
+  </body>
+</html>
