@@ -1,23 +1,24 @@
 var debug = false;	
 
 onmessage = function(e){
-  if ( e.data === "start" ) {
-    postMessage(Builder.run());
+  if ( e.data.msg === "start" ) {
+    postMessage(Builder.run(e.data.id,e.data.world));
   }
 };
 
-function Builder(width,height)
+function Builder(id,world)
 {
-  this.world = Builder.createWorld(width,height);
-  this.goal = {x:width-1,y:height-1};
+  this.id = id;
+  this.world = world;
+  this.goal = {x:this.world.length-1,y:this.world[0].length-1};
 
   this.fringe = [new Builder.Node({p:{x:0,y:0},m:[]},0)];
   this.candidate = this.fringe[0];
 }
 
-Builder.run = function()
+Builder.run = function(id,world)
 {
-    var b = new Builder(1000,1000);
+    var b = new Builder(id,world);
     var i=0;
     while (true)
     {
@@ -27,7 +28,8 @@ Builder.run = function()
 	  break;
     } 
     b.summary(b.candidate,i);
-    return Builder.output(b.world,b.candidate);
+    return {id:id,msg:"candidate",candidate:b.candidate};
+    //Builder.output(b.world,b.candidate);
 }
 
 Builder.prototype.step = function()
@@ -85,21 +87,6 @@ Builder.expand = function(node,actions,goal,world)
 Builder.goalTest = function(state,goal)
 {
   return ((state.p.x==goal.x) && (state.p.y==goal.y));
-}
-
-Builder.createWorld = function(width,height)
-{
-  var world = [];
-  for (var i=0;i<height;i++)
-  {
-    world.push([]);
-    for (var j=0;j<width;j++)
-    {
-      world[i][j] = Math.round(Math.random()*3)!=1;
-    }
-  }
-  
-  return world;
 }
 
 Builder.Node = function(state,cost)
@@ -242,26 +229,4 @@ Builder.prototype.summary = function(solution,steps)
     console.log("Failure");
 
   console.log("Fringe length: "+ this.fringe.length);
-}
-
-Builder.output = function(world,solution)
-{
-  var html = "";
-  if (solution==null)
-      solution={state:{m:[]}};
-
-  for (var i=0;i<world.length;i++)
-  {
-      for (var j=0;j<world[0].length;j++)
-      {
-	  if ((Builder.worldState(world,solution.state.m,i,j)) && (!world[i][j]))
-	      html += "=";
-	  else if (world[i][j])
-	      html += "_";
-	  else
-	      html += "#";
-      }
-      html += "<br />";
-  }
-  return html;
 }

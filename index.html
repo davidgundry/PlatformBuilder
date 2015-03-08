@@ -8,7 +8,7 @@
   <body>
   <div style="font-family:mono" id="outputTarget"></div>
     <script type="text/javascript">
-	var worker = new Worker("builder.js");
+	var worker = new Worker("manager.js");
 	
 	worker.onmessage = function(e){
 	    document.getElementById("outputTarget").innerHTML= e.data;
