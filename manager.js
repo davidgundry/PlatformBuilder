@@ -25,11 +25,6 @@ Agent.prototype.plan = function(world,updateCountdown)
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
 
-Agent.prototype.keepPlanning = function(updateCountdown)
-{
-    this.planner.postMessage({msg:"continue",id:this.id,updateCountdown:updateCountdown});
-}
-
 Agent.createPlanner = function(m)
 {
       var planner = new Worker("builder.js");
@@ -85,7 +80,7 @@ Manager.prototype.rePlanAgents = function()
 	{
 	    this.agents[i].complete = false;
 	    this.agents[i].plan(this.world,this.updateCountdown);
-	    if (debug>0)
+	    if (debug>1)
 		console.log("Started replanning agent "+i);
 	}
 	else if (!this.agents[i].complete)
@@ -94,7 +89,7 @@ Manager.prototype.rePlanAgents = function()
 		//this.agents[i].planner.terminate();  
 	    //this.agents[i].planner = Agent.createPlanner(this);
 	    this.agents[i].plan(this.world,this.updateCountdown);
-	    if (debug>0)
+	    if (debug>1)
 		console.log("Continued planning agent "+i);
 	}
     }
@@ -204,8 +199,9 @@ Manager.prototype.runAgents = function()
     else
     {
 	if (debug>0)
-	  console.log("Returning final(?) output");
-	postMessage({msg:"world",world:this.world});
+	  console.log("Returning final output");
+	postMessage({msg:"done",world:this.world});
+	close();
     }
 }
 

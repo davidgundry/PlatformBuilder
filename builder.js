@@ -5,15 +5,17 @@ var builder = null
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
     builder = new Builder(e.data.world,e.data.origin,e.data.goal);
-    postMessage(Builder.run(e.data.id,e.data.updateCountdown));
+    Builder.run(e.data.id,e.data.updateCountdown);
   } 
   else if ( e.data.msg === "continue" ) {
-    postMessage(Builder.run(e.data.id,e.data.updateCountdown));
+    Builder.run(e.data.id,e.data.updateCountdown);
   }
 };
 
 function Builder(world,origin,goal)
 {
+  if (debug > 0)
+      this.time = performance.now();
   this.world = world;
   this.goal = goal;
 
@@ -27,6 +29,7 @@ function Builder(world,origin,goal)
   this.closedList = [];
   this.currentNode = this.fringe[0];
 }
+Builder.prototype.stepNo = 0;
 
 Builder.inWorldBounds = function(x,y,world)
 {
@@ -35,13 +38,10 @@ Builder.inWorldBounds = function(x,y,world)
 
 Builder.run = function(id,updateCountdown)
 {
-    if (debug > 0)
-      var time = performance.now();
-    var i=0;
     var countdown = updateCountdown;
     while (countdown >= 0)
     {
-	i++;
+	builder.stepNo++;
 	if (Builder.goalTest(builder.currentNode.state,builder.goal))
 	  break;
 	builder.step();
@@ -49,7 +49,8 @@ Builder.run = function(id,updateCountdown)
 	{
 	    var c = Builder.createCandidate(builder.currentNode)
 	    countdown=updateCountdown;
-	    return {id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m};
+	    postMessage({id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m});
+	    return;
 	}
 	else
 	    countdown--;
@@ -59,11 +60,12 @@ Builder.run = function(id,updateCountdown)
     {
 	if (debug>0)
 	{
-	    time = performance.now()-time;
-	    builder.summary(builder.currentNode,i,time);
+	    builder.time = performance.now()-builder.time;
+	    builder.summary(builder.currentNode,builder.stepNo,builder.time);
 	}
 	var c = Builder.createCandidate(builder.currentNode)
-	return {id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m};
+	postMessage({id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m});
+	close();
     }
     else
 	console.log("Builder failed to return candidate");

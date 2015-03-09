@@ -21,7 +21,7 @@
 	/**
 	 * The number of milliseconds after which the manager will enact the best plan each agent has provided
 	 */
-	var activityTime = 5000;
+	var activityTime = 10000;
 	
 	var manager = new Worker("manager.js");
 	var canvas = document.getElementById("outputTarget");
@@ -44,7 +44,7 @@
 	var world = null;
 	
 	manager.onmessage = function(e){
-	    if (e.data.msg==="world")
+	    if ((e.data.msg==="world") || (e.data.msg==="done"))
 	    {
 		if (debug)
 		{
