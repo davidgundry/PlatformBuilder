@@ -1,4 +1,4 @@
-var debug = false;	
+var debug = 1;	
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
@@ -27,7 +27,7 @@ Builder.run = function(id,world,origin,goal)
 	  break;
 	builder.step();
     } 
-    if (debug)
+    if (debug>0)
 	builder.summary(builder.currentNode,i);
     return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
 }
@@ -46,12 +46,12 @@ Builder.createCandidate = function(currentNode,closedList)
 
 Builder.prototype.step = function()
 {
-    if (debug)
+    if (debug>1)
 	console.log("Fringe length: "+this.fringe.length);
     
     if (this.currentNode != null)
     {
-	if (debug)
+	if (debug>1)
 	{
 	    console.log(this.currentNode.state.p);
 	    console.log(this.currentNode.heuristic);
@@ -95,7 +95,7 @@ Builder.expand = function(node,actions,goal,world)
 	    children.push(child);
 	}
     }
-    if (debug)
+    if (debug>1)
 	console.log("Added "+children.length+" nodes");
     return children;
 }
