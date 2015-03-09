@@ -49,7 +49,7 @@ Manager.run = function()
 	    };
 	m.agents[i].plan(m.world);
     }
-    postMessage(Manager.output(m.world));
+    postMessage(m.world);
 }
 
 Manager.prototype.rePlanAgents = function()
@@ -130,7 +130,7 @@ Manager.prototype.runAgents = function()
  
     if (firstToFail != -1)
     {
-      postMessage(Manager.output(this.world));
+      postMessage(this.world);
       this.agents[firstToFail].candidate = null;
       this.rePlanAgents();
     }
@@ -138,7 +138,7 @@ Manager.prototype.runAgents = function()
     {
 	if (debug)
 	  console.log("Returning final output");
-	postMessage(Manager.output(this.world));
+	postMessage(this.world);
     }
 }
 
@@ -199,7 +199,7 @@ Manager.moveUp = function(world)
   return world;
 }
 
-Manager.output = function(world)
+/*Manager.output = function(world)
 {
     var html = "";
 
@@ -229,4 +229,4 @@ Manager.output = function(world)
 	html += "<br />";
     }
     return html;
-}
+}*/

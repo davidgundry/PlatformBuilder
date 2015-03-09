@@ -3,18 +3,35 @@
   <head>
     <meta charset="utf-8" />
     <title>Builder</title>
+    <script type="text/javascript" src="renderer.js"></script>
   </head>
 
-  <body>
-  <div style="font-family:monospace; line-height:1;" id="outputTarget"></div>
+  <body style="margin:0;">
+  <canvas id="outputTarget"></canvas>
     <script type="text/javascript">
-	var worker = new Worker("manager.js");
+	var debug = true;
+    
+	var manager = new Worker("manager.js");
+	var canvas = document.getElementById("outputTarget");
 	
-	worker.onmessage = function(e){
-	    document.getElementById("outputTarget").innerHTML= e.data;//document.getElementById("outputTarget").innerHTML+"<br /><br />"+e.data;
+	var maxWidth = window.innerWidth;
+	var maxHeight = window.innerHeight;
+	maxWidth = Math.min(maxWidth,maxHeight);
+	maxHeight = maxWidth;
+	
+	manager.onmessage = function(e){
+	    if (debug)
+	    {
+		console.log("Recieved data to render");
+		console.log(e.data)
+	    }
+	    Renderer.render(canvas,e.data,Math.floor(maxWidth/e.data.length),Math.floor(maxHeight/e.data[0].length));
 	};
 	
-	worker.postMessage("start");
+	manager.postMessage("start");
+	if (debug)
+	  console.log("Started Manager");
+
     </script>
   </body>
 </html>
