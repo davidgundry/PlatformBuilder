@@ -24,7 +24,7 @@ Agent.prototype.plan = function(world)
 
 function Manager()
 {
-    this.agents = Array(2);
+    this.agents = Array(6);
     this.world = Manager.createWorld(10,10)
 }
 
