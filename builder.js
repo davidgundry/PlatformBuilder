@@ -51,7 +51,7 @@ Builder.createCandidate = function(currentNode,closedList)
 	actions.push(n.action);
 	n = n.parent;
     }
-    return actions.reverse();
+    return actions;
 }
 
 Builder.prototype.step = function()

@@ -112,23 +112,22 @@ Manager.worldState = function(world,modifications,x,y)
 Manager.prototype.runAgents = function()
 {
     var firstToFail = -1;
-    var max = 1;
-    for (var a=0;a<max;a++)
+    var stillActive = true;
+    while ((firstToFail == -1) && (stillActive))
     {
-	if (firstToFail != -1)
-	      break;
+	stillActive = false;
 	for (var i=0;i<this.agents.length;i++)
 	    if (this.agents[i].candidate != null)
 	    {
-		if (this.agents[i].candidate.length > max)
-		    max = this.agents[i].candidate.length;
-		if (this.agents[i].candidate.length-1 >= a)
+		if (this.agents[i].candidate.length > 0)
 		{
-		    if (!this.action(this.agents[i].candidate[a],i))
+		    if (!this.action(this.agents[i].candidate.pop(),i))
 		    {
-		      firstToFail = i;
-		      break;
+			firstToFail = i;
+			break;
 		    }
+		    else
+			stillActive = true;
 		}
 	    }
     }
