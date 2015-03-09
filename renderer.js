@@ -52,8 +52,8 @@ Renderer.renderPath = function(canvas,points,blockWidth=1, blockHeight=1)
       var halfWidth = Math.round(blockWidth/2);
       var halfHeight = Math.round(blockHeight/2);
       
-      offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
-      offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
+      var offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
+      var offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
 	  
       for (var i=points.length-2;i>=0;i--)
       {
