@@ -13,7 +13,7 @@ function Agent(id,origin,goal)
     this.candidate = null;
     
     this.origin = origin;
-    this.position = origin;
+    this.position = {x:this.origin.x,y:this.origin.y};
     this.goal = goal;
 }
 
@@ -24,7 +24,7 @@ Agent.prototype.plan = function(world)
 
 function Manager()
 {
-    this.agents = Array(5);
+    this.agents = Array(2);
     this.world = Manager.createWorld(100,100)
 }
 
