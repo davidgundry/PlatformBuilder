@@ -262,7 +262,7 @@ Builder.buildLeft = function(node,world)
     return null;
 }
 
-Builder.buildCost = 5;
+Builder.buildCost = 3;
 
 
 /**

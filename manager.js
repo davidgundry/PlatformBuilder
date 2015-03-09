@@ -24,7 +24,7 @@ Agent.prototype.plan = function(world)
 
 function Manager()
 {
-    this.agents = Array(1);
+    this.agents = Array(2);
     this.world = Manager.createWorld(10,10)
 }
 
@@ -39,7 +39,6 @@ Manager.run = function()
 	origin = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
 	m.world[origin.x][origin.y]=3;
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
-	goal.x = 0;
 	m.world[goal.x][goal.y] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner.onmessage = function(e){
