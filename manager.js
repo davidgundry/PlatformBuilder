@@ -1,17 +1,14 @@
-var debug = 1;	
+var debug = 1;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    Manager.run(e.data.numAgents,e.data.width,e.data.height);
+    Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.updateCountdown,e.data.activityTime);
   }
 };
 
 function Agent(id,origin,goal)
 {
-    this.id = id;
-    this.planner = new Worker("builder.js");
-    this.candidate = null;
-    
+    this.id = id;   
     this.origin = origin;
     this.position = {x:this.origin.x,y:this.origin.y};
     this.goal = goal;
@@ -19,10 +16,30 @@ function Agent(id,origin,goal)
 
 Agent.prototype.points = [];
 Agent.prototype.modifications = [];
+Agent.prototype.complete = false;
+Agent.prototype.planner = null;
+Agent.prototype.candidate = null;
 
-Agent.prototype.plan = function(world)
+Agent.prototype.plan = function(world,updateCountdown)
 {
-    this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal});
+    this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
+}
+
+Agent.createPlanner = function(m)
+{
+      var planner = new Worker("builder.js");
+      planner.onmessage = function(e){
+	  if (e.data.msg === "candidate")
+	  {
+	      m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications,true);    postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:true});
+	  }
+	  else if (e.data.msg === "current")
+	  {
+	      m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications,false);
+	      postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:false});
+	  }
+      };
+      return planner;
 }
 
 function Manager(numAgents,width,height)
@@ -31,9 +48,10 @@ function Manager(numAgents,width,height)
     this.world = Manager.createWorld(width,height)
 }
 
-Manager.run = function(numAgents,width,height)
+Manager.run = function(numAgents,width,height,updateCountdown,activityTime)
 {
     var m = new Manager(numAgents,width,height);
+    m.updateCountdown = updateCountdown;
     var builder;
     var origin;
     var goal;
@@ -44,15 +62,13 @@ Manager.run = function(numAgents,width,height)
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
 	m.world[goal.x][goal.y] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
-	m.agents[i].planner.onmessage = function(e){
-	    if (e.data.msg === "candidate")
-		m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications);
-	    else if (e.data.msg === "current")
-		postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:false});
-	    };
-	m.agents[i].plan(m.world);
+	m.agents[i].planner = Agent.createPlanner(m);
+	m.agents[i].plan(m.world,updateCountdown);
     }
     postMessage({msg:"world",world:m.world});
+    setInterval(function() {
+      m.runAgents();
+    },activityTime);
 }
 
 Manager.prototype.rePlanAgents = function()
@@ -61,9 +77,19 @@ Manager.prototype.rePlanAgents = function()
     {
 	if (this.agents[i].candidate == null)
 	{
-	  this.agents[i].plan(this.world);
-	  if (debug>1)
-	      console.log("Started replanning agent "+i);
+	    this.agents[i].complete = false;
+	    this.agents[i].plan(this.world,this.updateCountdown);
+	    if (debug>0)
+		console.log("Started replanning agent "+i);
+	}
+	else if (!this.agents[i].complete)
+	{
+	    //if (this.agents[i].planner != null)
+		//this.agents[i].planner.terminate();  
+	    //this.agents[i].planner = Agent.createPlanner(this);
+	    this.agents[i].plan(this.world,this.updateCountdown);
+	    if (debug>0)
+		console.log("Continued planning agent "+i);
 	}
     }
 }
@@ -83,29 +109,32 @@ Manager.createWorld = function(width,height)
   return world;
 }
 
-Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modifications)
+Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modifications,complete)
 {
-    if (debug>1)
-    {
-	console.log("Agent "+workerIndex+" has a candidate solution");
-	console.log(candidate);
-    }
     this.agents[workerIndex].candidate = candidate;
     this.agents[workerIndex].points = points;
     this.agents[workerIndex].modifications = modifications;
+    this.agents[workerIndex].complete = complete;
 	    
+   
+    if (debug>1)
+    {
+	if (complete)
+	    console.log("Agent "+workerIndex+" has a candidate solution");
+	else
+	    console.log("Agent "+workerIndex+" has a current-best solution");
+    }
+    /*
     var finished = true;
     for (var i=0;i<this.agents.length;i++)
-	if (this.agents[i].candidate == null)
+	if (!this.agents[i].complete)
 	{
 	    finished = false;
 	    break;
 	}
-	
-    postMessage({msg:"agentpath",agent:workerIndex,points:points,modifications:modifications,complete:true});
-	
+
     if (finished)
-	this.runAgents();
+	this.runAgents();*/
 }
 
 Manager.worldState = function(world,modifications,x,y)
@@ -116,6 +145,20 @@ Manager.worldState = function(world,modifications,x,y)
 	return true;
   }
   return world[x][y];
+}
+
+Manager.agentsAllComplete = function(agents)
+{
+    var allComplete = true;
+    for (var i=0;i<agents.length;i++)
+    {
+	if (!agents[i].complete)
+	{
+	  allComplete = false;
+	  break;
+	}
+    }
+    return allComplete;
 }
 
 Manager.prototype.runAgents = function()
@@ -143,14 +186,19 @@ Manager.prototype.runAgents = function()
  
     if (firstToFail != -1)
     {
-      postMessage({msg:"world",world:this.world});
-      this.agents[firstToFail].candidate = null;
-      this.rePlanAgents();
+	postMessage({msg:"world",world:this.world});
+	this.agents[firstToFail].candidate = null;
+	this.rePlanAgents();
+    }
+    else if (!Manager.agentsAllComplete(this.agents))
+    {
+	postMessage({msg:"world",world:this.world});
+	this.rePlanAgents();
     }
     else
     {
 	if (debug>0)
-	  console.log("Returning final output");
+	  console.log("Returning final(?) output");
 	postMessage({msg:"world",world:this.world});
     }
 }

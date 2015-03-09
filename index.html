@@ -12,8 +12,16 @@
 	var debug = false;
     
 	var numAgents = 4;
-	var width = 10;
-	var height = 10;
+	var width = 20;
+	var height = 20;
+	/**
+	 * Planners should send their current best solution every this many steps
+	 */
+	var updateCountdown = 100;
+	/**
+	 * The number of milliseconds after which the manager will enact the best plan each agent has provided
+	 */
+	var activityTime = 1000;
 	
 	var manager = new Worker("manager.js");
 	var canvas = document.getElementById("outputTarget");
@@ -60,7 +68,7 @@
 	    }
 	};
 	
-	manager.postMessage({msg:"start",numAgents:numAgents,width:width,height:height});
+	manager.postMessage({msg:"start",numAgents:numAgents,width:width,height:height,updateCountdown:updateCountdown,activityTime:activityTime});
 	if (debug)
 	  console.log("Started Manager");
 

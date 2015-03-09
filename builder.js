@@ -2,7 +2,7 @@ var debug = 1;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    postMessage(Builder.run(e.data.id,e.data.world,e.data.origin,e.data.goal));
+    postMessage(Builder.run(e.data.id,e.data.world,e.data.origin,e.data.goal,e.data.updateCountdown));
   }
 };
 
@@ -27,14 +27,14 @@ Builder.inWorldBounds = function(x,y,world)
     return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0));
 }
 
-Builder.run = function(id,world,origin,goal)
+Builder.run = function(id,world,origin,goal,updateCountdown)
 {
     if (debug > 0)
       var time = performance.now();
     var builder = new Builder(world,origin,goal);
     var i=0;
-    var countdown = 1000;
-    while (true)
+    var countdown = updateCountdown;
+    while (countdown >= 0)
     {
 	i++;
 	if (Builder.goalTest(builder.currentNode.state,builder.goal))
@@ -43,20 +43,25 @@ Builder.run = function(id,world,origin,goal)
 	if (countdown == 0)
 	{
 	    var c = Builder.createCandidate(builder.currentNode)
-	    postMessage({id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m});
-	    countdown=1000;
+	    countdown=updateCountdown;
+	    return {id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m};
 	}
 	else
 	    countdown--;
     } 
     
-    if (debug>0)
+    if (Builder.goalTest(builder.currentNode.state,builder.goal))
     {
-	time = performance.now()-time;
-	builder.summary(builder.currentNode,i,time);
+	if (debug>0)
+	{
+	    time = performance.now()-time;
+	    builder.summary(builder.currentNode,i,time);
+	}
+	var c = Builder.createCandidate(builder.currentNode)
+	return {id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m};
     }
-    var c = Builder.createCandidate(builder.currentNode)
-    return {id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m};
+    else
+	console.log("Builder failed to return candidate");
 }
 
 Builder.createCandidate = function(currentNode,closedList)
