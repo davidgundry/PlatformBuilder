@@ -27,7 +27,8 @@ Builder.run = function(id,world,origin,goal)
 	  break;
 	builder.step();
     } 
-    builder.summary(builder.currentNode,i);
+    if (debug)
+	builder.summary(builder.currentNode,i);
     return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
 }
 

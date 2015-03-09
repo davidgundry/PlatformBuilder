@@ -1,4 +1,4 @@
-var debug = true;	
+var debug = false;	
 
 function Renderer()
 {
@@ -9,7 +9,7 @@ Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
     canvas.width=data.length * blockWidth;
     canvas.height=data[0].length * blockHeight;
     
-    context = canvas.getContext("2d");
+    var context = canvas.getContext("2d");
     
     context.fillStyle = "#eee";    
     context.fillRect(0, 0, canvas.width, canvas.height);

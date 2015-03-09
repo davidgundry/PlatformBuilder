@@ -1,4 +1,4 @@
-var debug = true;	
+var debug = false;	
 
 onmessage = function(e){
   if ( e.data === "start" ) {
@@ -14,8 +14,6 @@ function Agent(id,origin,goal)
     
     this.origin = origin;
     this.position = origin;
-    console.log(origin);
-    console.log(goal);
     this.goal = goal;
 }
 
