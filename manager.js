@@ -1,4 +1,4 @@
-var debug = false;	
+var debug = 1;	
 
 onmessage = function(e){
   if ( e.data === "start" ) {
@@ -57,7 +57,7 @@ Manager.prototype.rePlanAgents = function()
 	if (this.agents[i].candidate == null)
 	{
 	  this.agents[i].plan(this.world);
-	  if (debug)
+	  if (debug>1)
 	      console.log("Started replanning agent "+i);
 	}
     }
@@ -80,7 +80,7 @@ Manager.createWorld = function(width,height)
 
 Manager.prototype.gotCandidate = function(workerIndex,candidate)
 {
-    if (debug)
+    if (debug>1)
     {
 	console.log("Agent "+workerIndex+" has a candidate solution");
 	console.log(candidate);
@@ -134,7 +134,7 @@ Manager.prototype.runAgents = function()
     }
     else
     {
-	if (debug)
+	if (debug>1)
 	  console.log("Returning final output");
 	postMessage(this.world);
     }
@@ -164,7 +164,7 @@ Manager.prototype.action = function(actionID,agentID)
       this.agents[agentID].position.x--;
       break;
     case 4:
-      if ((this.agents[agentID].position.y-1 < 0) || (this.agents[agentID].position.y-1 >= this.world[0].length))
+      if (((this.agents[agentID].position.y-1 < 0) || (this.agents[agentID].position.y-1 >= this.world[0].length)) && (debug>0))
 	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"][" + (this.agents[agentID].position.y-1)+"]");
       else if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1]))
 	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1] = 2;
@@ -172,7 +172,7 @@ Manager.prototype.action = function(actionID,agentID)
 	  return false;
       break;
     case 5:
-      if ((this.agents[agentID].position.x+1 < 0) || (this.agents[agentID].position.x+1 >= this.world.length))
+      if (((this.agents[agentID].position.x+1 < 0) || (this.agents[agentID].position.x+1 >= this.world.length)) && (debug>0))
 	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]");
       else if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
 	  this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
@@ -180,7 +180,7 @@ Manager.prototype.action = function(actionID,agentID)
 	  return false;
       break;
     case 6:
-       if ((this.agents[agentID].position.y+1 < 0) || (this.agents[agentID].position.y+1 >= this.world[0].length))
+       if (((this.agents[agentID].position.y+1 < 0) || (this.agents[agentID].position.y+1 >= this.world[0].length)) && (debug>0))
 	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"][" + (this.agents[agentID].position.y+1)+"]");
       else if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1]))
 	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1] = 2;
@@ -188,7 +188,7 @@ Manager.prototype.action = function(actionID,agentID)
 	  return false;
       break;
     case 7:
-      if ((this.agents[agentID].position.x-1 < 0) || (this.agents[agentID].position.x-1 >= this.world.length))
+      if (((this.agents[agentID].position.x-1 < 0) || (this.agents[agentID].position.x-1 >= this.world.length)) && (debug>0))
 	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x-1)+"]["+this.agents[agentID].position.y+"]");
       else if (Manager.buildable(this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y]))
 	  this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y] = 2;
