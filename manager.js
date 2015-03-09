@@ -1,8 +1,8 @@
 var debug = 1;	
 
 onmessage = function(e){
-  if ( e.data === "start" ) {
-    Manager.run();
+  if ( e.data.msg === "start" ) {
+    Manager.run(e.data.numAgents,e.data.width,e.data.height);
   }
 };
 
@@ -17,20 +17,23 @@ function Agent(id,origin,goal)
     this.goal = goal;
 }
 
+Agent.prototype.points = [];
+Agent.prototype.modifications = [];
+
 Agent.prototype.plan = function(world)
 {
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal});
 }
 
-function Manager()
+function Manager(numAgents,width,height)
 {
-    this.agents = Array(6);
-    this.world = Manager.createWorld(10,10)
+    this.agents = Array(numAgents);
+    this.world = Manager.createWorld(width,height)
 }
 
-Manager.run = function()
+Manager.run = function(numAgents,width,height)
 {
-    var m = new Manager();
+    var m = new Manager(numAgents,width,height);
     var builder;
     var origin;
     var goal;
@@ -43,7 +46,9 @@ Manager.run = function()
 	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner.onmessage = function(e){
 	    if (e.data.msg === "candidate")
-		m.gotCandidate(e.data.id,e.data.candidate,e.data.points);
+		m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications);
+	    else if (e.data.msg === "current")
+		postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:false});
 	    };
 	m.agents[i].plan(m.world);
     }
@@ -78,7 +83,7 @@ Manager.createWorld = function(width,height)
   return world;
 }
 
-Manager.prototype.gotCandidate = function(workerIndex,candidate,points)
+Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modifications)
 {
     if (debug>1)
     {
@@ -87,6 +92,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points)
     }
     this.agents[workerIndex].candidate = candidate;
     this.agents[workerIndex].points = points;
+    this.agents[workerIndex].modifications = modifications;
 	    
     var finished = true;
     for (var i=0;i<this.agents.length;i++)
@@ -96,7 +102,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points)
 	    break;
 	}
 	
-    postMessage({msg:"agentpath",agent:workerIndex,points:points});
+    postMessage({msg:"agentpath",agent:workerIndex,points:points,modifications:modifications,complete:true});
 	
     if (finished)
 	this.runAgents();

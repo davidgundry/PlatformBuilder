@@ -9,8 +9,12 @@
   <body style="margin:0;">
   <canvas id="outputTarget"></canvas>
     <script type="text/javascript">
-	var debug = true;
+	var debug = false;
     
+	var numAgents = 4;
+	var width = 10;
+	var height = 10;
+	
 	var manager = new Worker("manager.js");
 	var canvas = document.getElementById("outputTarget");
 	
@@ -19,8 +23,17 @@
 	maxWidth = Math.min(maxWidth,maxHeight);
 	maxHeight = maxWidth;
 	
-	var bWidth=1;
-	var bHeight=1;
+	var blockWidth = Math.max(1,Math.floor(maxWidth/width));
+	var blockHeight = Math.max(1,Math.floor(maxHeight/height));
+	
+	var agentPaths = [];
+	for (var i=0;i<numAgents;i++)
+	{	  
+	    var offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
+	    var offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
+	    agentPaths.push(new Path(offsetX,offsetY));
+	}
+	var world = null;
 	
 	manager.onmessage = function(e){
 	    if (e.data.msg==="world")
@@ -30,19 +43,24 @@
 		    console.log("Recieved data to render");
 		    console.log(e.data)
 		}
-		bWidth = Math.max(1,Math.floor(maxWidth/e.data.world.length));
-		bHeight = Math.max(1,Math.floor(maxHeight/e.data.world[0].length));
-		Renderer.render(canvas,e.data.world,bWidth,bHeight);
+
+		world = e.data.world;
+		Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
 	    }
 	    else if (e.data.msg==="agentpath")
 	    {		
 		if (debug)
 		    console.log("Recieved path to render");
-		Renderer.renderPath(canvas,e.data.points,bWidth,bHeight)
+		agentPaths[e.data.agent].points = e.data.points;
+		agentPaths[e.data.agent].complete = e.data.complete;
+		agentPaths[e.data.agent].modifications = e.data.modifications;
+		if (world != null)
+		    Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
+		Renderer.renderPaths(canvas,agentPaths,blockWidth,blockHeight)
 	    }
 	};
 	
-	manager.postMessage("start");
+	manager.postMessage({msg:"start",numAgents:numAgents,width:width,height:height});
 	if (debug)
 	  console.log("Started Manager");
 

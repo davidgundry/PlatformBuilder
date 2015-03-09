@@ -33,12 +33,21 @@ Builder.run = function(id,world,origin,goal)
       var time = performance.now();
     var builder = new Builder(world,origin,goal);
     var i=0;
+    var countdown = 1000;
     while (true)
     {
 	i++;
 	if (Builder.goalTest(builder.currentNode.state,builder.goal))
 	  break;
 	builder.step();
+	if (countdown == 0)
+	{
+	    var c = Builder.createCandidate(builder.currentNode)
+	    postMessage({id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m});
+	    countdown=1000;
+	}
+	else
+	    countdown--;
     } 
     
     if (debug>0)
@@ -47,7 +56,7 @@ Builder.run = function(id,world,origin,goal)
 	builder.summary(builder.currentNode,i,time);
     }
     var c = Builder.createCandidate(builder.currentNode)
-    return {id:id,msg:"candidate",candidate:c.a,points:c.p};
+    return {id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m};
 }
 
 Builder.createCandidate = function(currentNode,closedList)
@@ -61,7 +70,7 @@ Builder.createCandidate = function(currentNode,closedList)
 	points.push(n.state.p);
 	n = n.parent;
     }
-    return {a:actions,p:points};
+    return {a:actions,p:points,m:currentNode.state.m};
 }
 
 Builder.prototype.step = function()

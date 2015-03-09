@@ -1,10 +1,20 @@
 var debug = false;	
 
+function Path(offsetX,offsetY)
+{
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+}
+
+Path.prototype.modifications = [];
+Path.prototype.points = [];
+Path.prototype.complete = false;
+
 function Renderer()
 {
 }
 
-Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
+Renderer.renderWorld = function(canvas,data,blockWidth=1, blockHeight=1)
 {
     canvas.width=data.length * blockWidth;
     canvas.height=data[0].length * blockHeight;
@@ -12,7 +22,7 @@ Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
     var context = canvas.getContext("2d");
     
     context.fillStyle = "#eee";    
-    //context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
     
     for (var i=0;i<data.length;i++)
@@ -44,23 +54,38 @@ Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
 	console.log("Rendering finished");
 }
 
-Renderer.renderPath = function(canvas,points,blockWidth=1, blockHeight=1)
+Renderer.renderPaths = function(canvas,paths,blockWidth=1, blockHeight=1)
 {
       var context = canvas.getContext("2d");
-      context.strokeStyle="#f00";
-	  
+
       var halfWidth = Math.round(blockWidth/2);
       var halfHeight = Math.round(blockHeight/2);
       
-      var offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
-      var offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
+      for (var p=0;p<paths.length;p++)
+      {     
+	  if (paths[p].complete)
+	      context.strokeStyle="#f00";
+	  else
+	      context.strokeStyle="#00f";
+	  for (var i=paths[p].points.length-2;i>=0;i--)
+	  {
+	      context.beginPath();
+	      context.moveTo(paths[p].offsetX+blockWidth*(paths[p].points[i+1].x)+halfWidth,paths[p].offsetY+blockHeight*(paths[p].points[i+1].y)+halfHeight);
+	      context.lineTo(paths[p].offsetX+blockWidth*(paths[p].points[i].x)+halfWidth,paths[p].offsetY+blockHeight*(paths[p].points[i].y)+halfHeight);
+	      context.stroke();
+	  }
 	  
-      for (var i=points.length-2;i>=0;i--)
-      {
-	  context.beginPath();
-	  context.moveTo(offsetX+blockWidth*(points[i+1].x)+halfWidth,offsetY+blockHeight*(points[i+1].y)+halfHeight);
-	  context.lineTo(offsetX+blockWidth*(points[i].x)+halfWidth,offsetY+blockHeight*(points[i].y)+halfHeight);
-	  context.stroke();
+	  var modDotWidth = Math.round(blockWidth/5);
+	  var modDotHeight = Math.round(blockHeight/5);
+	  
+	  for (var i=paths[p].modifications.length-1;i>=0;i--)
+	  {
+	      if (paths[p].complete)
+		  context.fillStyle="#f00";
+	      else
+		  context.fillStyle="#00f";
+	      context.fillRect(paths[p].modifications[i][0]*blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), paths[p].modifications[i][1]*blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);
+	  }
       }
 }
    
