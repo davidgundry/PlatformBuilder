@@ -11,9 +11,19 @@ function Builder(world,origin,goal)
   this.world = world;
   this.goal = goal;
 
+  if (!Builder.inWorldBounds(origin.x,origin.y,world) && (debug>0))
+    console.log("Origin " + origin.x +", "+origin.y +" not in world bounds.");
+  if (!Builder.inWorldBounds(goal.x,goal.y,world) && (debug>0))
+    console.log("Goal " + goal.x +", "+goal.y +" not in world bounds.");
+  
   this.fringe = [new Builder.Node({p:origin,m:[]},0,null)];
   this.closedList = [];
   this.currentNode = this.fringe[0];
+}
+
+Builder.inWorldBounds = function(x,y,world)
+{
+    return ((x < world.length) && (x > 0) && (y < world[0].length) && (y > 0));
 }
 
 Builder.run = function(id,world,origin,goal)
