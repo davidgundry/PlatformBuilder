@@ -24,8 +24,8 @@ Agent.prototype.plan = function(world)
 
 function Manager()
 {
-    this.agents = Array(18);
-    this.world = Manager.createWorld(1000,1000)
+    this.agents = Array(1);
+    this.world = Manager.createWorld(10,10)
 }
 
 Manager.run = function()
@@ -66,12 +66,12 @@ Manager.prototype.rePlanAgents = function()
 Manager.createWorld = function(width,height)
 {
   var world = [];
-  for (var i=0;i<height;i++)
+  for (var i=0;i<width;i++)
   {
     world.push([]);
-    for (var j=0;j<width;j++)
+    for (var j=0;j<height;j++)
     {
-      world[i][j] = Math.round(Math.random()*0.7);
+      world[i][j] = Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
     }
   }
   

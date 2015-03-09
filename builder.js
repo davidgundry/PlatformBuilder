@@ -1,4 +1,4 @@
-var debug = 1;	
+var debug = 2;	
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
@@ -62,11 +62,7 @@ Builder.prototype.step = function()
     if (this.currentNode != null)
     {
 	if (debug>1)
-	{
-	    console.log(this.currentNode.state.p);
-	    console.log(this.currentNode.heuristic);
-	    console.log("m length:"+this.currentNode.state.m.length);
-	}
+	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length);
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
 	this.closedList.push(this.currentNode);
 	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
@@ -82,12 +78,12 @@ Builder.prototype.step = function()
 
 Builder.sort = function(fringe)
 {
-    fringe = fringe.sort(function(a,b){return a.heuristic-b.heuristic;});
+    fringe = fringe.sort(function(a,b){return (a.heuristic+a.cost)-(b.heuristic+b.cost);});
     
     for (var i=1;i<fringe.length;i++)
-	if (fringe[0] == fringe[i])
+	if (Builder.Node.equals(fringe[0],fringe[i]))
 	{
-	    if (debug)
+	    if (debug>1)
 		console.log("duplicate removed");
 	    fringe.splice(i,1);
 	}
@@ -120,6 +116,11 @@ Builder.Node = function(state,cost,action)
     this.state = state;
     this.cost = cost;
     this.action = action;
+}
+
+Builder.Node.equals = function(n1,n2)
+{
+  return (n1.state == n2.state)
 }
 
 Builder.Node.prototype.heuristic = 0;
@@ -195,7 +196,7 @@ Builder.buildUp = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,4);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,4);
 	}
     return null;
 }
@@ -209,7 +210,7 @@ Builder.buildRight = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x+1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,5);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,5);
 	}
     return null;
 }
@@ -223,7 +224,7 @@ Builder.buildDown = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,6);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,6);
 	}
     return null;
 }
@@ -237,7 +238,7 @@ Builder.buildLeft = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x-1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+50,7);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,7);
 	}
     return null;
 }
