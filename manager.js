@@ -24,7 +24,7 @@ Agent.prototype.plan = function(world)
 
 function Manager()
 {
-    this.agents = Array(2);
+    this.agents = Array(5);
     this.world = Manager.createWorld(100,100)
 }
 
@@ -111,20 +111,27 @@ Manager.worldState = function(world,modifications,x,y)
 
 Manager.prototype.runAgents = function()
 {
-  var firstToFail = -1;
-  var max = 1;
+    var firstToFail = -1;
+    var max = 1;
     for (var a=0;a<max;a++)
+    {
+	if (firstToFail != -1)
+	      break;
 	for (var i=0;i<this.agents.length;i++)
-	  if (this.agents[i].candidate != null)
-	  {
-	      if (this.agents[i].candidate.length > max)
-		max = this.agents[i].candidate.length;
-	      if (this.agents[i].candidate.length-1 >= a)
-	      {
-		  if (!this.action(this.agents[i].candidate[a],i))
-		    firstToFail = i;
-	      }
-	  }
+	    if (this.agents[i].candidate != null)
+	    {
+		if (this.agents[i].candidate.length > max)
+		    max = this.agents[i].candidate.length;
+		if (this.agents[i].candidate.length-1 >= a)
+		{
+		    if (!this.action(this.agents[i].candidate[a],i))
+		    {
+		      firstToFail = i;
+		      break;
+		    }
+		}
+	    }
+    }
  
     if (firstToFail != -1)
     {
