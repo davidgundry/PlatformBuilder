@@ -249,15 +249,12 @@ Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.mov
 
 Builder.prototype.summary = function(solution,steps)
 {
-  console.log("Steps to completion: "+ steps);
   if (solution != null)
   {
     if (solution.state != null)
-      console.log("Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y);
+      console.log("Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
   }
   else
-    console.log("Failure");
+    console.log("Failure. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
 
-  console.log("Fringe length: "+ this.fringe.length);
-  console.log("Closed list length: "+ this.closedList.length);
 }
