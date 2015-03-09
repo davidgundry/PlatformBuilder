@@ -1,4 +1,4 @@
-var debug = 1;	
+var debug = 2;	
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
@@ -149,7 +149,7 @@ Builder.heuristic = function(state,goal)
     var xdiff = goal.x - state.p.x;
     var ydiff = goal.y - state.p.y;
     //return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
-    return xdiff+ydiff;
+    return Math.abs(xdiff)+Math.abs(ydiff);
 }
 
 Builder.walkable = function(world,modifications,x,y)
