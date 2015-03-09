@@ -25,6 +25,11 @@ Agent.prototype.plan = function(world,updateCountdown)
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
 
+Agent.prototype.keepPlanning = function(updateCountdown)
+{
+    this.planner.postMessage({msg:"continue",id:this.id,updateCountdown:updateCountdown});
+}
+
 Agent.createPlanner = function(m)
 {
       var planner = new Worker("builder.js");
@@ -37,6 +42,7 @@ Agent.createPlanner = function(m)
 	  {
 	      m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications,false);
 	      postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:false});
+	      planner.postMessage({msg:"continue",id:e.data.id,updateCountdown:m.updateCountdown});
 	  }
       };
       return planner;

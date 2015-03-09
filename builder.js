@@ -1,8 +1,14 @@
 var debug = 1;	
 
+var builder = null
+
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    postMessage(Builder.run(e.data.id,e.data.world,e.data.origin,e.data.goal,e.data.updateCountdown));
+    builder = new Builder(e.data.world,e.data.origin,e.data.goal);
+    postMessage(Builder.run(e.data.id,e.data.updateCountdown));
+  } 
+  else if ( e.data.msg === "continue" ) {
+    postMessage(Builder.run(e.data.id,e.data.updateCountdown));
   }
 };
 
@@ -27,11 +33,10 @@ Builder.inWorldBounds = function(x,y,world)
     return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0));
 }
 
-Builder.run = function(id,world,origin,goal,updateCountdown)
+Builder.run = function(id,updateCountdown)
 {
     if (debug > 0)
       var time = performance.now();
-    var builder = new Builder(world,origin,goal);
     var i=0;
     var countdown = updateCountdown;
     while (countdown >= 0)
