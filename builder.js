@@ -1,4 +1,4 @@
-var debug = 2;	
+var debug = 1;	
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
@@ -75,7 +75,7 @@ Builder.prototype.step = function()
 	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
 	for (var i=0;i<newNodes.length;i++)
 	{
-	  newNodes[i].heuristic = Builder.heuristic(newNodes[i].state,this.goal);
+	  newNodes[i].heuristic = newNodes[i].cost + Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
 	}
 	this.fringe = Builder.sort(this.fringe,newNodes);
@@ -91,7 +91,7 @@ Builder.sort = function(fringe,newNodes)
 	{
 	    if (Builder.Node.equals(newNodes[i],fringe[j]))
 	    {
-		if ((newNodes[i].heuristic+newNodes[i].cost) < (fringe[j].heuristic+fringe[j].cost))
+		if ((newNodes[i].heuristic) < (fringe[j].heuristic))
 		    fringe.splice(j,1);
 		else
 		{
@@ -103,7 +103,7 @@ Builder.sort = function(fringe,newNodes)
     }
     
     fringe = fringe.concat(newNodes);
-    fringe = fringe.sort(function(a,b){return (a.heuristic+a.cost)-(b.heuristic+b.cost);});
+    fringe = fringe.sort(function(a,b){return (a.heuristic)-(b.heuristic);});
     
     return fringe;
 }
