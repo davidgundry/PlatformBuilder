@@ -1,4 +1,4 @@
-var debug = 2;	
+var debug = 1;	
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
@@ -10,6 +10,7 @@ function Builder(world,origin,goal)
 {
   this.world = world;
   this.goal = goal;
+
 
   if (!Builder.inWorldBounds(origin.x,origin.y,world) && (debug>0))
     console.log("ERROR: Origin " + origin.x +", "+origin.y +" not in world bounds.");
@@ -28,6 +29,8 @@ Builder.inWorldBounds = function(x,y,world)
 
 Builder.run = function(id,world,origin,goal)
 {
+    if (debug > 0)
+      var time = performance.now();
     var builder = new Builder(world,origin,goal);
     var i=0;
     while (true)
@@ -37,8 +40,12 @@ Builder.run = function(id,world,origin,goal)
 	  break;
 	builder.step();
     } 
+    
     if (debug>0)
-	builder.summary(builder.currentNode,i);
+    {
+	time = performance.now()-time;
+	builder.summary(builder.currentNode,i,time);
+    }
     return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
 }
 
@@ -71,22 +78,33 @@ Builder.prototype.step = function()
 	  newNodes[i].heuristic = Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
 	}
-	this.fringe = Builder.sort(this.fringe.concat(newNodes));
+	this.fringe = Builder.sort(this.fringe,newNodes);
 	this.currentNode = this.fringe[0];
     }
 }
 
-Builder.sort = function(fringe)
+Builder.sort = function(fringe,newNodes)
 {
+    for (var i=newNodes.length-1;i>=0;i--)
+    {
+	for (var j=fringe.length-1;j>=0;j--)
+	{
+	    if (Builder.Node.equals(newNodes[i],fringe[j]))
+	    {
+		if ((newNodes[i].heuristic+newNodes[i].cost) < (fringe[j].heuristic+fringe[j].cost))
+		    fringe.splice(j,1);
+		else
+		{
+		    newNodes.splice(i,1);
+		    break;
+		}
+	    }
+	}
+    }
+    
+    fringe = fringe.concat(newNodes);
     fringe = fringe.sort(function(a,b){return (a.heuristic+a.cost)-(b.heuristic+b.cost);});
     
-    for (var i=1;i<fringe.length;i++)
-	if (Builder.Node.equals(fringe[0],fringe[i]))
-	{
-	    if (debug>1)
-		console.log("duplicate removed");
-	    fringe.splice(i,1);
-	}
     return fringe;
 }
 
@@ -120,7 +138,7 @@ Builder.Node = function(state,cost,action)
 
 Builder.Node.equals = function(n1,n2)
 {
-  return (n1.state == n2.state)
+  return (n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y)
 }
 
 Builder.Node.prototype.heuristic = 0;
@@ -130,7 +148,8 @@ Builder.heuristic = function(state,goal)
 {
     var xdiff = goal.x - state.p.x;
     var ydiff = goal.y - state.p.y;
-    return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
+    //return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
+    return xdiff+ydiff;
 }
 
 Builder.walkable = function(world,modifications,x,y)
@@ -156,7 +175,7 @@ Builder.moveUp = function(node,world)
 
 Builder.moveRight = function(node,world)
 {
-    if (node.state.p.x < world.length-2)
+    if (node.state.p.x < world.length-1)
 	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var p = {x:node.state.p.x+1,y:node.state.p.y};
@@ -167,7 +186,7 @@ Builder.moveRight = function(node,world)
 
 Builder.moveDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-2)
+    if (node.state.p.y < world[0].length-1)
 	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var p = {x:node.state.p.x,y:(node.state.p.y+1)};
@@ -196,35 +215,35 @@ Builder.buildUp = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,4);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,4);
 	}
     return null;
 }
 
 Builder.buildRight = function(node,world)
 {
-    if (node.state.p.x < world.length-2)
+    if (node.state.p.x < world.length-1)
 	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x+1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,5);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,5);
 	}
     return null;
 }
 
 Builder.buildDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-2)
+    if (node.state.p.y < world[0].length-1)
 	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,6);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,6);
 	}
     return null;
 }
@@ -238,7 +257,7 @@ Builder.buildLeft = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x-1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+5,7);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,7);
 	}
     return null;
 }
@@ -257,12 +276,12 @@ Builder.buildLeft = function(node,world)
 Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown];
 
 
-Builder.prototype.summary = function(solution,steps)
+Builder.prototype.summary = function(solution,steps,time)
 {
   if (solution != null)
   {
     if (solution.state != null)
-      console.log("Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
+      console.log(time + "ms Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
   }
   else
     console.log("Failure. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
