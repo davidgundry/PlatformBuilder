@@ -215,7 +215,7 @@ Builder.buildUp = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,4);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,4);
 	}
     return null;
 }
@@ -229,7 +229,7 @@ Builder.buildRight = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x+1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,5);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,5);
 	}
     return null;
 }
@@ -243,7 +243,7 @@ Builder.buildDown = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x,node.state.p.y+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,6);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,6);
 	}
     return null;
 }
@@ -257,10 +257,12 @@ Builder.buildLeft = function(node,world)
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	  n.push([node.state.p.x-1,node.state.p.y]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+0,7);
+	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,7);
 	}
     return null;
 }
+
+Builder.buildCost = 5;
 
 
 /**
