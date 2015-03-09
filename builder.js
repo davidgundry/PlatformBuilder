@@ -138,7 +138,7 @@ Builder.Node = function(state,cost,action)
 
 Builder.Node.equals = function(n1,n2)
 {
-  return (n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y)
+  return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.m == n2.state.m))
 }
 
 Builder.Node.prototype.heuristic = 0;
