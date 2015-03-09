@@ -25,7 +25,7 @@
 		console.log("Recieved data to render");
 		console.log(e.data)
 	    }
-	    Renderer.render(canvas,e.data,Math.floor(maxWidth/e.data.length),Math.floor(maxHeight/e.data[0].length));
+	    Renderer.render(canvas,e.data,Math.max(1,Math.floor(maxWidth/e.data.length)),Math.max(1,Math.floor(maxHeight/e.data[0].length)));
 	};
 	
 	manager.postMessage("start");
