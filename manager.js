@@ -164,25 +164,33 @@ Manager.prototype.action = function(actionID,agentID)
       this.agents[agentID].position.x--;
       break;
     case 4:
-      if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1]))
+      if ((this.agents[agentID].position.y-1 < 0) || (this.agents[agentID].position.y-1 >= this.world[0].length))
+	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"][" + (this.agents[agentID].position.y-1)+"]");
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1]))
 	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y-1] = 2;
       else
 	  return false;
       break;
     case 5:
-      if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
+      if ((this.agents[agentID].position.x+1 < 0) || (this.agents[agentID].position.x+1 >= this.world.length))
+	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]");
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y]))
 	  this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y] = 2;
       else
 	  return false;
       break;
     case 6:
-      if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1]))
+       if ((this.agents[agentID].position.y+1 < 0) || (this.agents[agentID].position.y+1 >= this.world[0].length))
+	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"][" + (this.agents[agentID].position.y+1)+"]");
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1]))
 	  this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1] = 2;
       else
 	  return false;
       break;
     case 7:
-      if (Manager.buildable(this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y]))
+      if ((this.agents[agentID].position.x-1 < 0) || (this.agents[agentID].position.x-1 >= this.world.length))
+	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x-1)+"]["+this.agents[agentID].position.y+"]");
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y]))
 	  this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y] = 2;
       else
 	  return false;

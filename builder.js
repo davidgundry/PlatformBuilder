@@ -246,7 +246,6 @@ Builder.buildLeft = function(node,world)
 Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown];
 
 
-
 Builder.prototype.summary = function(solution,steps)
 {
   if (solution != null)
