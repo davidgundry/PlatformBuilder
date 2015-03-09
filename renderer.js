@@ -12,7 +12,7 @@ Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
     var context = canvas.getContext("2d");
     
     context.fillStyle = "#eee";    
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    //context.fillRect(0, 0, canvas.width, canvas.height);
 
     
     for (var i=0;i<data.length;i++)
@@ -42,5 +42,22 @@ Renderer.render = function(canvas,data,blockWidth=1, blockHeight=1)
     }
     if (debug)
 	console.log("Rendering finished");
+}
+
+Renderer.renderPath = function(canvas,points,blockWidth=1, blockHeight=1)
+{
+      var context = canvas.getContext("2d");
+      context.strokeStyle="#f00";
+	  
+      var halfWidth = Math.round(blockWidth/2);
+      var halfHeight = Math.round(blockHeight/2);
+	  
+      for (var i=points.length-2;i>=0;i--)
+      {
+	  context.beginPath();
+	  context.moveTo(blockWidth*(points[i+1].x)+halfWidth,blockHeight*(points[i+1].y)+halfHeight);
+	  context.lineTo(blockWidth*(points[i].x)+halfWidth,blockHeight*(points[i].y)+halfHeight);
+	  context.stroke();
+      }
 }
    

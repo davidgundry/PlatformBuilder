@@ -9,7 +9,7 @@
   <body style="margin:0;">
   <canvas id="outputTarget"></canvas>
     <script type="text/javascript">
-	var debug = false;
+	var debug = true;
     
 	var manager = new Worker("manager.js");
 	var canvas = document.getElementById("outputTarget");
@@ -19,13 +19,27 @@
 	maxWidth = Math.min(maxWidth,maxHeight);
 	maxHeight = maxWidth;
 	
+	var bWidth=1;
+	var bHeight=1;
+	
 	manager.onmessage = function(e){
-	    if (debug)
+	    if (e.data.msg==="world")
 	    {
-		console.log("Recieved data to render");
-		console.log(e.data)
+		if (debug)
+		{
+		    console.log("Recieved data to render");
+		    console.log(e.data)
+		}
+		bWidth = Math.max(1,Math.floor(maxWidth/e.data.world.length));
+		bHeight = Math.max(1,Math.floor(maxHeight/e.data.world[0].length));
+		Renderer.render(canvas,e.data.world,bWidth,bHeight);
 	    }
-	    Renderer.render(canvas,e.data,Math.max(1,Math.floor(maxWidth/e.data.length)),Math.max(1,Math.floor(maxHeight/e.data[0].length)));
+	    else if (e.data.msg==="agentpath")
+	    {		
+		if (debug)
+		    console.log("Recieved path to render");
+		Renderer.renderPath(canvas,e.data.points,bWidth,bHeight)
+	    }
 	};
 	
 	manager.postMessage("start");

@@ -43,11 +43,11 @@ Manager.run = function()
 	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner.onmessage = function(e){
 	    if (e.data.msg === "candidate")
-		m.gotCandidate(e.data.id,e.data.candidate);
+		m.gotCandidate(e.data.id,e.data.candidate,e.data.points);
 	    };
 	m.agents[i].plan(m.world);
     }
-    postMessage(m.world);
+    postMessage({msg:"world",world:m.world});
 }
 
 Manager.prototype.rePlanAgents = function()
@@ -78,7 +78,7 @@ Manager.createWorld = function(width,height)
   return world;
 }
 
-Manager.prototype.gotCandidate = function(workerIndex,candidate)
+Manager.prototype.gotCandidate = function(workerIndex,candidate,points)
 {
     if (debug>1)
     {
@@ -86,6 +86,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate)
 	console.log(candidate);
     }
     this.agents[workerIndex].candidate = candidate;
+    this.agents[workerIndex].points = points;
 	    
     var finished = true;
     for (var i=0;i<this.agents.length;i++)
@@ -94,6 +95,8 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate)
 	    finished = false;
 	    break;
 	}
+	
+    postMessage({msg:"agentpath",agent:workerIndex,points:points});
 	
     if (finished)
 	this.runAgents();
@@ -134,15 +137,15 @@ Manager.prototype.runAgents = function()
  
     if (firstToFail != -1)
     {
-      postMessage(this.world);
+      postMessage({msg:"world",world:this.world});
       this.agents[firstToFail].candidate = null;
       this.rePlanAgents();
     }
     else
     {
-	if (debug>1)
+	if (debug>0)
 	  console.log("Returning final output");
-	postMessage(this.world);
+	postMessage({msg:"world",world:this.world});
     }
 }
 

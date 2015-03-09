@@ -46,19 +46,22 @@ Builder.run = function(id,world,origin,goal)
 	time = performance.now()-time;
 	builder.summary(builder.currentNode,i,time);
     }
-    return {id:id,msg:"candidate",candidate:Builder.createCandidate(builder.currentNode)};
+    var c = Builder.createCandidate(builder.currentNode)
+    return {id:id,msg:"candidate",candidate:c.a,points:c.p};
 }
 
 Builder.createCandidate = function(currentNode,closedList)
 {
     var actions = [];
+    var points = [];
     var n = currentNode;
     while (n != null)
     {
 	actions.push(n.action);
+	points.push(n.state.p);
 	n = n.parent;
     }
-    return actions;
+    return {a:actions,p:points};
 }
 
 Builder.prototype.step = function()
