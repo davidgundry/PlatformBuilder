@@ -1,8 +1,13 @@
 var debug = 1;
 
+var m = null;
+
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
     Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.updateCountdown,e.data.activityTime);
+  }
+  else if ( e.data.msg === "pause" ) {
+    m.pause();
   }
 };
 
@@ -25,6 +30,11 @@ Agent.prototype.plan = function(world,updateCountdown)
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
 
+Agent.prototype.stop = function()
+{
+    this.planner.postMessage({msg:"stop"});
+}
+
 Agent.createPlanner = function(m)
 {
       var planner = new Worker("builder.js");
@@ -37,7 +47,8 @@ Agent.createPlanner = function(m)
 	  {
 	      m.gotCandidate(e.data.id,e.data.candidate,e.data.points,e.data.modifications,false);
 	      postMessage({msg:"agentpath",agent:e.data.id,points:e.data.points,modifications:e.data.modifications,complete:false});
-	      planner.postMessage({msg:"continue",id:e.data.id,updateCountdown:m.updateCountdown});
+	      if (!m.paused)
+		  planner.postMessage({msg:"continue",id:e.data.id,updateCountdown:m.updateCountdown});
 	  }
       };
       return planner;
@@ -49,9 +60,11 @@ function Manager(numAgents,width,height)
     this.world = Manager.createWorld(width,height)
 }
 
+Manager.prototype.paused = false;
+
 Manager.run = function(numAgents,width,height,updateCountdown,activityTime)
 {
-    var m = new Manager(numAgents,width,height);
+    m = new Manager(numAgents,width,height);
     m.updateCountdown = updateCountdown;
     var builder;
     var origin;
@@ -70,6 +83,13 @@ Manager.run = function(numAgents,width,height,updateCountdown,activityTime)
     setInterval(function() {
       m.runAgents();
     },activityTime);
+}
+
+Manager.prototype.pause = function()
+{
+    if (debug>0)
+	console.log("Manager paused/unpaused");
+    this.paused = !this.paused;
 }
 
 Manager.prototype.rePlanAgents = function()
@@ -165,44 +185,49 @@ Manager.agentsAllComplete = function(agents)
 
 Manager.prototype.runAgents = function()
 {
-    var firstToFail = -1;
-    var stillActive = true;
-    while ((firstToFail == -1) && (stillActive))
+    if (!this.paused)
     {
-	stillActive = false;
-	for (var i=0;i<this.agents.length;i++)
-	    if (this.agents[i].candidate != null)
-	    {
-		if (this.agents[i].candidate.length > 0)
+	var firstToFail = -1;
+	var stillActive = true;
+	while ((firstToFail == -1) && (stillActive))
+	{
+	    stillActive = false;
+	    for (var i=0;i<this.agents.length;i++)
+		if (this.agents[i].candidate != null)
 		{
-		    if (!this.action(this.agents[i].candidate.pop(),i))
+		    if (this.agents[i].candidate.length > 0)
 		    {
-			firstToFail = i;
-			break;
+			if (!this.action(this.agents[i].candidate.pop(),i))
+			{
+			    firstToFail = i;
+			    break;
+			}
+			else
+			    stillActive = true;
 		    }
-		    else
-			stillActive = true;
 		}
-	    }
-    }
- 
-    if (firstToFail != -1)
-    {
-	postMessage({msg:"world",world:this.world});
-	this.agents[firstToFail].candidate = null;
-	this.rePlanAgents();
-    }
-    else if (!Manager.agentsAllComplete(this.agents))
-    {
-	postMessage({msg:"world",world:this.world});
-	this.rePlanAgents();
-    }
-    else
-    {
-	if (debug>0)
-	  console.log("Returning final output");
-	postMessage({msg:"done",world:this.world});
-	close();
+	}
+    
+	if (firstToFail != -1)
+	{
+	    postMessage({msg:"world",world:this.world});
+	    this.agents[firstToFail].candidate = null;
+	    this.rePlanAgents();
+	}
+	else if (!Manager.agentsAllComplete(this.agents))
+	{
+	    postMessage({msg:"world",world:this.world});
+	    this.rePlanAgents();
+	}
+	else
+	{
+	    if (debug>0)
+	      console.log("Returning final output");
+	    for (var i=0;i<this.agents.length;i++)
+	      this.agents[i].stop();
+	    postMessage({msg:"done",world:this.world});
+	    close();
+	}
     }
 }
 

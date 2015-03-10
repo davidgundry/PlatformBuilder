@@ -8,10 +8,11 @@
     </head>
 
     <body style="margin:0;">
-	<canvas id="outputTarget"></canvas>
+	<canvas id="outputTarget" onClick="pause()"></canvas>
 	<script type="text/javascript">
 	    var c = new Core();
 	    c.run(document.getElementById("outputTarget"));
+	    function pause(){c.pause()};
 	</script>
     </body>
 </html>

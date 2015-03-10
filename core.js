@@ -1,6 +1,6 @@
-function Core(width=50,height=50,agents=4,updateCountdown=100,activityTime=1000)
+function Core(width=50,height=50,agents=4,updateCountdown=100,activityTime=10000)
 {
-    this.debug = false;
+    this.debug = true;
 
     this.numAgents = agents;
     this.width = width;
@@ -13,12 +13,21 @@ function Core(width=50,height=50,agents=4,updateCountdown=100,activityTime=1000)
      * The number of milliseconds after which the manager will enact the best plan each agent has provided
      */
     this.activityTime = activityTime;
+    
+    this.manager =  new Worker("manager.js");
+    this.paused = false;
 }
- 
+
+Core.prototype.pause = function()
+{
+    if (this.debug)
+	console.log("paused/unpaused");
+    this.paused = !this.paused;
+    this.manager.postMessage({msg:"pause"});
+}
+
 Core.prototype.run = function(canvas)
 {
-    var manager = new Worker("manager.js");
-
     var maxWidth = window.innerWidth;
     var maxHeight = window.innerHeight;
     maxWidth = Math.min(maxWidth,maxHeight);
@@ -36,7 +45,7 @@ Core.prototype.run = function(canvas)
     }
     var world = null;
     
-    manager.onmessage = function(e){
+    this.manager.onmessage = function(e){
 	if ((e.data.msg==="world") || (e.data.msg==="done"))
 	{
 	    if (debug)
@@ -61,7 +70,7 @@ Core.prototype.run = function(canvas)
 	}
     };
     
-    manager.postMessage({msg:"start",numAgents:this.numAgents,width:this.width,height:this.height,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
+    this.manager.postMessage({msg:"start",numAgents:this.numAgents,width:this.width,height:this.height,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
     
     if (debug)
       console.log("Started Manager");

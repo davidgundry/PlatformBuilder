@@ -10,6 +10,9 @@ onmessage = function(e){
   else if ( e.data.msg === "continue" ) {
     Builder.run(e.data.id,e.data.updateCountdown);
   }
+  else if ( e.data.msg === "stop" ) {
+    close();
+  }
 };
 
 function Builder(world,origin,goal)
