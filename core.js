@@ -14,8 +14,6 @@ function Core(width=50,height=50,agents=4,updateCountdown=100,activityTime=1000)
      */
     this.activityTime = activityTime;
 }
-
-
  
 Core.prototype.run = function(canvas)
 {
@@ -69,8 +67,6 @@ Core.prototype.run = function(canvas)
       console.log("Started Manager");
   
 }
-
-Core.prototype.managerMessage
 
 
     
