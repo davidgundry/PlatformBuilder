@@ -1,77 +1,17 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Builder</title>
-    <script type="text/javascript" src="renderer.js"></script>
-  </head>
+    <head>
+	<meta charset="utf-8" />
+	<title>Builder</title>
+	<script type="text/javascript" src="renderer.js"></script>
+	<script type="text/javascript" src ="core.js"></script>
+    </head>
 
-  <body style="margin:0;">
-  <canvas id="outputTarget"></canvas>
-    <script type="text/javascript">
-	var debug = false;
-    
-	var numAgents = 4;
-	var width = 20;
-	var height = 20;
-	/**
-	 * Planners should send their current best solution every this many steps
-	 */
-	var updateCountdown = 100;
-	/**
-	 * The number of milliseconds after which the manager will enact the best plan each agent has provided
-	 */
-	var activityTime = 10000;
-	
-	var manager = new Worker("manager.js");
-	var canvas = document.getElementById("outputTarget");
-	
-	var maxWidth = window.innerWidth;
-	var maxHeight = window.innerHeight;
-	maxWidth = Math.min(maxWidth,maxHeight);
-	maxHeight = maxWidth;
-	
-	var blockWidth = Math.max(1,Math.floor(maxWidth/width));
-	var blockHeight = Math.max(1,Math.floor(maxHeight/height));
-	
-	var agentPaths = [];
-	for (var i=0;i<numAgents;i++)
-	{	  
-	    var offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
-	    var offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
-	    agentPaths.push(new Path(offsetX,offsetY));
-	}
-	var world = null;
-	
-	manager.onmessage = function(e){
-	    if ((e.data.msg==="world") || (e.data.msg==="done"))
-	    {
-		if (debug)
-		{
-		    console.log("Recieved data to render");
-		    console.log(e.data)
-		}
-
-		world = e.data.world;
-		Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
-	    }
-	    else if (e.data.msg==="agentpath")
-	    {		
-		if (debug)
-		    console.log("Recieved path to render");
-		agentPaths[e.data.agent].points = e.data.points;
-		agentPaths[e.data.agent].complete = e.data.complete;
-		agentPaths[e.data.agent].modifications = e.data.modifications;
-		if (world != null)
-		    Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
-		Renderer.renderPaths(canvas,agentPaths,blockWidth,blockHeight)
-	    }
-	};
-	
-	manager.postMessage({msg:"start",numAgents:numAgents,width:width,height:height,updateCountdown:updateCountdown,activityTime:activityTime});
-	if (debug)
-	  console.log("Started Manager");
-
-    </script>
-  </body>
+    <body style="margin:0;">
+	<canvas id="outputTarget"></canvas>
+	<script type="text/javascript">
+	    var c = new Core();
+	    c.run(document.getElementById("outputTarget"));
+	</script>
+    </body>
 </html>

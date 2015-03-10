@@ -88,6 +88,7 @@ Manager.prototype.rePlanAgents = function()
 	    //if (this.agents[i].planner != null)
 		//this.agents[i].planner.terminate();  
 	    //this.agents[i].planner = Agent.createPlanner(this);
+	    this.agents[i].candidate = null;
 	    this.agents[i].plan(this.world,this.updateCountdown);
 	    if (debug>1)
 		console.log("Continued planning agent "+i);
