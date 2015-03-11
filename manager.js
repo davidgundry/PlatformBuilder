@@ -4,7 +4,7 @@ var m = null;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    Manager.run(e.data.numAgents,e.data.width,e.data.height,,e.data.depth,e.data.updateCountdown,e.data.activityTime);
+    Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
   }
   else if ( e.data.msg === "pause" ) {
     m.pause();
@@ -71,10 +71,14 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
     var goal;
     for (var i=0;i<m.agents.length;i++)
     {
-	origin = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1)),z:Math.round(Math.random()*(m.world[0][0].length-1))};
+	origin = {x:Math.round(Math.random()*(m.world.length-1)),
+	  y:Math.round(Math.random()*(m.world[0].length-1)),
+	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
-	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1)),z:Math.round(Math.random()*(m.world[0][0].length-1))};
-	m.world[goal.x][goal.y][goal.y] = 4;
+	goal = {x:Math.round(Math.random()*(m.world.length-1)),
+	  y:Math.round(Math.random()*(m.world[0].length-1)),
+	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
+	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner = Agent.createPlanner(m);
 	m.agents[i].plan(m.world,updateCountdown);

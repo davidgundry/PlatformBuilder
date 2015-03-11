@@ -321,7 +321,7 @@ Builder.prototype.summary = function(solution,steps,time)
   if (solution != null)
   {
     if (solution.state != null)
-      console.log(time + "ms Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " z:"+solution.state.p.z " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
+      console.log(time + "ms Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " z:"+solution.state.p.z +" in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
   }
   else
     console.log("Failure. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
