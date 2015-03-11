@@ -232,88 +232,44 @@ Builder.buildable = function(world,modifications,x,y,z)
   return (world[x][y][z]==0);
 }
 
+Builder.moveBy = function(node,world,x,z,actionCode)
+{
+    if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y,node.state.p.z+z))
+    {
+      var p = {x:node.state.p.x+x,y:node.state.p.y,z:node.state.p.z+z};
+      return new Builder.Node({p:p,m:node.state.m},node.cost+1,actionCode);
+    }
+    else if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y-1,node.state.p.z+z))
+    {
+      var p = {x:node.state.p.x+x,y:node.state.p.y-1,z:node.state.p.z+z};
+      return new Builder.Node({p:p,m:node.state.m},node.cost+1,actionCode);
+    }
+    else if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y+1,node.state.p.z+z))
+    {
+      var p = {x:node.state.p.x+x,y:node.state.p.y+1,z:node.state.p.z+z};
+      return new Builder.Node({p:p,m:node.state.m},node.cost+1,actionCode);
+    }
+    return null;
+}
+
 Builder.moveUp = function(node,world)
 {
-    if (node.state.p.z > 0)
-	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y,z:node.state.p.z-1};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z-1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y-1,z:node.state.p.z-1};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y+1,z:node.state.p.z-1};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
-	}
-    return null;
+    return Builder.moveBy(node,world,0,-1,0);
 }
 
 Builder.moveRight = function(node,world)
 {
-    if (node.state.p.x < world.length-1)
-	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
-	{
-	  var p = {x:node.state.p.x+1,y:node.state.p.y,z:node.state.p.z};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y-1,node.state.p.z))
-	{
-	  var p = {x:node.state.p.x+1,y:node.state.p.y-1,z:node.state.p.z};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
-	{
-	  var p = {x:node.state.p.x+1,y:node.state.p.y+1,z:node.state.p.z};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
-	}
-    return null;
+    return Builder.moveBy(node,world,1,0,1);
 }
 
 Builder.moveDown = function(node,world)
 {
-    if (node.state.p.z < world[0][0].length-1)
-	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y,z:(node.state.p.z+1)};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z+1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y-1,z:(node.state.p.z+1)};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
-	{
-	  var p = {x:node.state.p.x,y:node.state.p.y+1,z:(node.state.p.z+1)};
-	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
-	}
-    return null;
+    return Builder.moveBy(node,world,0,1,2);
 }
 
 Builder.moveLeft = function(node,world)
 {
-    if (node.state.p.x > 0)
-	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
-	{
-	    var p = {x:node.state.p.x-1,y:node.state.p.y,z:node.state.p.z};
-	    return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y-1,node.state.p.z))
-	{
-	    var p = {x:node.state.p.x-1,y:node.state.p.y-1,z:node.state.p.z};
-	    return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
-	}
-	else if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
-	{
-	    var p = {x:node.state.p.x-1,y:node.state.p.y+1,z:node.state.p.z};
-	    return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
-	}
-    return null;
+    return Builder.moveBy(node,world,-1,0,3);
 }
 
 Builder.buildUp = function(node,world)

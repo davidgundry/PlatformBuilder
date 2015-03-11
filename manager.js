@@ -326,7 +326,6 @@ Manager.prototype.action = function(actionID,agentID)
     return true;
 }
 
-
 Manager.prototype.moveUp = function(agentID)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z--))
