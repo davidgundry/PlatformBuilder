@@ -192,6 +192,9 @@ Builder.heuristic = function(state,goal)
 
 Builder.walkable = function(world,modifications,x,y,z)
 {
+  if (!Builder.inWorldBounds(x,y,z,world) || (y+2>=world[0].length))
+    return false;
+  
   var floor = false;
   var headroom = true;
 
@@ -236,6 +239,16 @@ Builder.moveUp = function(node,world)
 	  var p = {x:node.state.p.x,y:node.state.p.y,z:node.state.p.z-1};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
 	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z-1))
+	{
+	  var p = {x:node.state.p.x,y:node.state.p.y-1,z:node.state.p.z-1};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
+	{
+	  var p = {x:node.state.p.x,y:node.state.p.y+1,z:node.state.p.z-1};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
+	}
     return null;
 }
 
@@ -245,6 +258,16 @@ Builder.moveRight = function(node,world)
 	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
 	{
 	  var p = {x:node.state.p.x+1,y:node.state.p.y,z:node.state.p.z};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y-1,node.state.p.z))
+	{
+	  var p = {x:node.state.p.x+1,y:node.state.p.y-1,z:node.state.p.z};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
+	{
+	  var p = {x:node.state.p.x+1,y:node.state.p.y+1,z:node.state.p.z};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
 	}
     return null;
@@ -258,6 +281,16 @@ Builder.moveDown = function(node,world)
 	  var p = {x:node.state.p.x,y:node.state.p.y,z:(node.state.p.z+1)};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
 	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z+1))
+	{
+	  var p = {x:node.state.p.x,y:node.state.p.y-1,z:(node.state.p.z+1)};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
+	{
+	  var p = {x:node.state.p.x,y:node.state.p.y+1,z:(node.state.p.z+1)};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
+	}
     return null;
 }
 
@@ -267,6 +300,16 @@ Builder.moveLeft = function(node,world)
 	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
 	{
 	  var p = {x:node.state.p.x-1,y:node.state.p.y,z:node.state.p.z};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y-1,node.state.p.z))
+	{
+	  var p = {x:node.state.p.x-1,y:node.state.p.y-1,z:node.state.p.z};
+	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
+	}
+	else if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
+	{
+	  var p = {x:node.state.p.x-1,y:node.state.p.y+1,z:node.state.p.z};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
 	}
     return null;
