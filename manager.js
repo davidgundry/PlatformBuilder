@@ -219,15 +219,18 @@ Manager.prototype.runAgents = function()
 	    this.rePlanAgents();
 	}
 	else
-	{
-	    if (debug>0)
-		console.log("Returning final output");
-	    for (var i=0;i<this.agents.length;i++)
-		this.agents[i].stop();
-	    postMessage({msg:"done",world:this.world});
-	    close();
-	}
+	    this.complete();
     }
+}
+
+Manager.prototype.complete = function()
+{
+    if (debug>0)
+	console.log("Returning final output");
+    for (var i=0;i<this.agents.length;i++)
+	this.agents[i].stop();
+    postMessage({msg:"done",world:this.world});
+    close();
 }
 
 Manager.buildable = function(tile)
