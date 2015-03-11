@@ -300,58 +300,57 @@ Builder.buildLeft = function(node,world)
     return null;
 }
 
-//----------------------------------------------
-Builder.buildFloorUp = function(node,world)
+Builder.buildStepUp = function(node,world)
 {
-    if ((node.state.p.z > 0) && (node.state.p.y > 0))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z-1))
+    if ((node.state.p.z > 0) && (node.state.p.y < world[0].length-1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y-1,node.state.p.z-1]);
+	  n.push([node.state.p.x,node.state.p.y+1,node.state.p.z-1]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,8);
 	}
     return null;
 }
 
-Builder.buildFloorRight = function(node,world)
+Builder.buildStepRight = function(node,world)
 {
-    if ((node.state.p.x < world.length-1) && (node.state.p.y > 0))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y-1,node.state.p.z))
+    if ((node.state.p.x < world.length-1) && (node.state.p.y < world[0].length-1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x+1,node.state.p.y-1,node.state.p.z]);
+	  n.push([node.state.p.x+1,node.state.p.y+1,node.state.p.z]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,9);
 	}
     return null;
 }
 
-Builder.buildFloorDown = function(node,world)
+Builder.buildStepDown = function(node,world)
 {
-    if ((node.state.p.z < world[0][0].length-1) && (node.state.p.y > 0))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1,node.state.p.z+1))
+    if ((node.state.p.z < world[0][0].length-1) && (node.state.p.y < world[0].length-1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y-1,node.state.p.z+1]);
+	  n.push([node.state.p.x,node.state.p.y+1,node.state.p.z+1]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,10);
 	}
     return null;
 }
 
-Builder.buildFloorLeft = function(node,world)
+Builder.buildStepLeft = function(node,world)
 {
-    if ((node.state.p.x > 0) && (node.state.p.y > 0))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y-1,node.state.p.z))
+    if ((node.state.p.x > 0) && (node.state.p.y < world[0].length-1))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x-1,node.state.p.y-1,node.state.p.z]);
+	  n.push([node.state.p.x-1,node.state.p.y+1,node.state.p.z]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,11);
 	}
     return null;
@@ -369,12 +368,12 @@ Builder.buildCost = 3;
  * buildRight = 5
  * buildDown = 6
  * buildLeft = 7
- * buildFloorUp = 8
- * buildFloorRight = 9
- * buildFloorDown = 10
- * buildFloorLeft = 11
+ * buildStepUp = 8
+ * buildStepRight = 9
+ * buildStepDown = 10
+ * buildStepLeft = 11
  */
-Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown,Builder.buildFloorRight,Builder.buildFloorLeft,Builder.buildFloorUp,Builder.buildFloorDown];
+Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown,Builder.buildStepRight,Builder.buildStepLeft,Builder.buildStepUp,Builder.buildStepDown];
 
 
 Builder.prototype.summary = function(solution,steps,time)
