@@ -33,6 +33,8 @@ function Builder(world,origin,goal)
   this.currentNode = this.fringe[0];
 }
 Builder.prototype.stepNo = 0;
+Builder.costWeight = 0.2;
+Builder.heuristicWeight = 0.8;
 
 Builder.inWorldBounds = function(x,y,z,world)
 {
@@ -94,6 +96,8 @@ Builder.prototype.step = function()
     
     if (this.currentNode != null)
     {
+	if (Builder.goalTest(builder.currentNode.state,builder.goal))
+	    return false;
 	if (debug>1)
 	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + ","+this.currentNode.state.p.z + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length);
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
@@ -101,7 +105,7 @@ Builder.prototype.step = function()
 	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
 	for (var i=newNodes.length-1;i>=0;i--)
 	{
-	  newNodes[i].heuristic = newNodes[i].cost + Builder.heuristic(newNodes[i].state,this.goal);
+	  newNodes[i].heuristic = Builder.costWeight*newNodes[i].cost + Builder.heuristicWeight*Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
 	  for (var j=this.closedList.length-1;j>=0;j--)
 	  {

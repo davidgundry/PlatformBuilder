@@ -76,7 +76,7 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:2,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:4,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
@@ -329,7 +329,10 @@ Manager.prototype.action = function(actionID,agentID)
 Manager.prototype.moveBy = function(agentID,x,z)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y,this.agents[agentID].position.z+z))
+    {
+      	this.agents[agentID].position.x+x;
 	this.agents[agentID].position.z+z;
+    }
     else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y-1,this.agents[agentID].position.z+z))
     {
 	this.agents[agentID].position.x+x;
