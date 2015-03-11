@@ -326,68 +326,41 @@ Manager.prototype.action = function(actionID,agentID)
     return true;
 }
 
+Manager.prototype.moveBy = function(agentID,x,z)
+{
+    if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y,this.agents[agentID].position.z+z))
+	this.agents[agentID].position.z+z;
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y-1,this.agents[agentID].position.z+z))
+    {
+	this.agents[agentID].position.x+x;
+	this.agents[agentID].position.z+z;
+	this.agents[agentID].position.y--;
+    }
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+1,this.agents[agentID].position.z+z))
+    {
+	this.agents[agentID].position.z+z;
+	this.agents[agentID].position.y++;
+    }
+}
+
 Manager.prototype.moveUp = function(agentID)
 {
-    if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z--))
-      this.agents[agentID].position.z--;
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y-1,this.agents[agentID].position.z--))
-    {
-      this.agents[agentID].position.z--;
-      this.agents[agentID].position.y--;
-    }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z--))
-    {
-      this.agents[agentID].position.z--;
-      this.agents[agentID].position.y++;
-    }
+    this.moveBuy(agentID,0,-1);
 }
 
 Manager.prototype.moveRight = function(agentID)
 {
-    if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y,this.agents[agentID].position.z))
-      this.agents[agentID].position.x--;
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y-1,this.agents[agentID].position.z))
-    {
-      this.agents[agentID].position.x--;
-      this.agents[agentID].position.y--;
-    }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
-    {
-      this.agents[agentID].position.x--;
-      this.agents[agentID].position.y++;
-    }
+    this.moveBuy(agentID,1,0);
 }
 
 Manager.prototype.moveDown = function(agentID)
 {
-    if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z++))
-      this.agents[agentID].position.z++;
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y-1,this.agents[agentID].position.z++))
-    {
-      this.agents[agentID].position.z++;
-      this.agents[agentID].position.y--;
-    }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z++))
-    {
-      this.agents[agentID].position.z++;
-      this.agents[agentID].position.y++;
-    }
+    this.moveBuy(agentID,0,1);
 }
 
 Manager.prototype.moveLeft = function(agentID)
 {
-    if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y,this.agents[agentID].position.z))
-      this.agents[agentID].position.x--;
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y-1,this.agents[agentID].position.z))
-    {
-      this.agents[agentID].position.x--;
-      this.agents[agentID].position.y--;
-    }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
-    {
-      this.agents[agentID].position.x--;
-      this.agents[agentID].position.y++;
-    }
+    this.moveBuy(agentID,-1,0);
 }
 
 Manager.prototype.buildUp = function(agentID)
