@@ -341,104 +341,77 @@ Manager.prototype.moveBy = function(agentID,x,z)
 	this.agents[agentID].position.z+z;
 	this.agents[agentID].position.y++;
     }
+    else
+      return false;
+    return true;
 }
 
 Manager.prototype.moveUp = function(agentID)
 {
-    this.moveBuy(agentID,0,-1);
+    return this.moveBy(agentID,0,-1);
 }
 
 Manager.prototype.moveRight = function(agentID)
 {
-    this.moveBuy(agentID,1,0);
+    return this.moveBy(agentID,1,0);
 }
 
 Manager.prototype.moveDown = function(agentID)
 {
-    this.moveBuy(agentID,0,1);
+    return this.moveBy(agentID,0,1);
 }
 
 Manager.prototype.moveLeft = function(agentID)
 {
-    this.moveBuy(agentID,-1,0);
+    return this.moveBy(agentID,-1,0);
+}
+
+Manager.prototype.buildDirection = function(agentID,x,y,z)
+{
+    if (Manager.buildable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+y,this.agents[agentID].position.z+z))
+    {
+	this.world[this.agents[agentID].position.x+x][this.agents[agentID].position.y+y][this.agents[agentID].position.z+z] = 2;
+	return true;
+    }
+    return false; 
 }
 
 Manager.prototype.buildUp = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z-1))
-    {
-	this.world[this.agents[agentID].position.x][this.agents[agentID].position.y][this.agents[agentID].position.z-1] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,0,0,-1);
 }
 
 Manager.prototype.buildRight = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x+1,this.agents[agentID].position.y,this.agents[agentID].position.z))
-    {
-	this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y][this.agents[agentID].position.z] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,1,0,0);
 }
 
 Manager.prototype.buildDown = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z+1))
-    {
-	this.world[this.agents[agentID].position.x][this.agents[agentID].position.y][this.agents[agentID].position.z+1] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,0,0,1);
 }
 
 Manager.prototype.buildLeft = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x-1,this.agents[agentID].position.y,this.agents[agentID].position.z))
-    {
-	this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y][this.agents[agentID].position.z] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,-1,0,0);
 }
 
 Manager.prototype.buildStepUp = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z-1))
-    {
-	this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1][this.agents[agentID].position.z-1] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,0,1,-1);
 }
 
 Manager.prototype.buildStepRight = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x+1,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
-    {
-	this.world[this.agents[agentID].position.x+1][this.agents[agentID].position.y+1][this.agents[agentID].position.z] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,1,1,0);
 }
 
 Manager.prototype.buildStepDown = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z+1))
-    {
-	this.world[this.agents[agentID].position.x][this.agents[agentID].position.y+1][this.agents[agentID].position.z+1] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,0,1,1);
 }
 
 Manager.prototype.buildStepLeft = function(agentID)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x-1,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
-    {
-	this.world[this.agents[agentID].position.x-1][this.agents[agentID].position.y+1][this.agents[agentID].position.z] = 2;
-	return true;
-    }
-    return false; 
+    return this.buildDirection(agentID,-1,1,0);
 }
