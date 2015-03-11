@@ -338,6 +338,7 @@ Manager.prototype.moveBy = function(agentID,x,z)
     }
     else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+1,this.agents[agentID].position.z+z))
     {
+      	this.agents[agentID].position.x+x;
 	this.agents[agentID].position.z+z;
 	this.agents[agentID].position.y++;
     }
