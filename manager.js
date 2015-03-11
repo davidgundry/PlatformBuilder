@@ -235,7 +235,7 @@ Manager.prototype.complete = function()
 
 Manager.buildable = function(tile)
 {
-    if (tile ==0)
+    if (tile == 0)
 	return true;
     return false;
 }
@@ -270,19 +270,19 @@ Manager.prototype.action = function(actionID,agentID)
     switch (actionID)
     {
 	case 0:
-	    if (!this.stepUp(agentID))
+	    if (!this.moveUp(agentID))
 		return false;
 	    break;
 	case 1:
-	    if (!this.stepRight(agentID))
+	    if (!this.moveRight(agentID))
 		return false;
 	    break;
 	case 2:
-	    if (!this.stepDown(agentID))
+	    if (!this.moveDown(agentID))
 		return false;
 	    break;
 	case 3:
-	    if (!this.stepLeft(agentID))
+	    if (!this.moveLeft(agentID))
 		return false;
 	    break;
 	case 4:
@@ -322,7 +322,7 @@ Manager.prototype.action = function(actionID,agentID)
 }
 
 
-Manager.prototype.stepUp = function(agentID)
+Manager.prototype.moveUp = function(agentID)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z--))
       this.agents[agentID].position.z--;
@@ -338,7 +338,7 @@ Manager.prototype.stepUp = function(agentID)
     }
 }
 
-Manager.prototype.stepRight = function(agentID)
+Manager.prototype.moveRight = function(agentID)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y,this.agents[agentID].position.z))
       this.agents[agentID].position.x--;
@@ -354,7 +354,7 @@ Manager.prototype.stepRight = function(agentID)
     }
 }
 
-Manager.prototype.stepDown = function(agentID)
+Manager.prototype.moveDown = function(agentID)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z++))
       this.agents[agentID].position.z++;
@@ -370,7 +370,7 @@ Manager.prototype.stepDown = function(agentID)
     }
 }
 
-Manager.prototype.stepLeft = function(agentID)
+Manager.prototype.moveLeft = function(agentID)
 {
     if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y,this.agents[agentID].position.z))
       this.agents[agentID].position.x--;
@@ -392,18 +392,18 @@ Manager.prototype.buildUp = function(agentID)
 	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)) 
 	&& (debug>0))
     {
-    console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z-1)+"]");
+	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z-1)+"]");
     }
     else if (Manager.buildable(this.world[this.agents[agentID].position.x]
 					[this.agents[agentID].position.y]
 					[this.agents[agentID].position.z-1]))
     {
-      this.world[this.agents[agentID].position.x]
-		[this.agents[agentID].position.y]
-		[this.agents[agentID].position.z-1] = 2;
+	this.world[this.agents[agentID].position.x]
+		  [this.agents[agentID].position.y]
+		  [this.agents[agentID].position.z-1] = 2;
     }
     else
-      return false; 
+	return false; 
     return true;
 }
 
@@ -413,7 +413,7 @@ Manager.prototype.buildRight = function(agentID)
       || (this.agents[agentID].position.x+1 >= this.world.length))
       && (debug>0))
     {
-      console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
+	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
     }
     else if (Manager.buildable(this.world[this.agents[agentID].position.x+1]
 					  [this.agents[agentID].position.y]
@@ -557,41 +557,3 @@ Manager.prototype.buildStepLeft = function(agentID)
 	  return false;
       return true;
 }
-
-Manager.moveUp = function(world)
-{
- 
-  return world;
-}
-
-/*Manager.output = function(world)
-{
-    var html = "";
-
-    for (var i=0;i<world[0].length;i++)
-    {
-	for (var j=0;j<world.length;j++)
-	{
-	    switch (world[j][i])
-	    {
-	      case 0:
-		html += "&nbsp;";
-		break;
-	      case 1:
-		html += "▒";
-		break;
-	      case 2:
-		html += "█";
-		break;
-	      case 3:
-		html += "S";
-		break;
-	      case 4:
-		html += "E";
-		break;
-	    }
-	}
-	html += "<br />";
-    }
-    return html;
-}*/
