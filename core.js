@@ -1,10 +1,11 @@
-function Core(width=20,height=20,depth=20,agents=10,updateCountdown=100,activityTime=100000)
+function Core(width=5,height=5,depth=5,agents=1,updateCountdown=100,activityTime=100000)
 {
     this.debug = true;
 
     this.numAgents = agents;
     this.width = width;
     this.height = height;
+    this.depth = depth;
     /**
      * Planners should send their current best solution every this many steps
      */
@@ -30,11 +31,12 @@ Core.prototype.run = function(canvas)
 {
     var maxWidth = window.innerWidth;
     var maxHeight = window.innerHeight;
-    maxWidth = Math.min(maxWidth,maxHeight);
+    maxWidth = Math.min(maxWidth,maxHeight)/2;
     maxHeight = maxWidth;
     
     var blockWidth = Math.max(1,Math.floor(maxWidth/this.width));
-    var blockHeight = Math.max(1,Math.floor(maxHeight/this.height));
+    var blockHeight = Math.max(1,Math.floor(maxHeight/this.depth));
+    var renderer = new Renderer(canvas,this.width,this.height,this.depth,blockWidth,blockHeight);
     
     var agentPaths = [];
     for (var i=0;i<this.numAgents;i++)
@@ -55,7 +57,7 @@ Core.prototype.run = function(canvas)
 	    }
 
 	    world = e.data.world;
-	    Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
+	    renderer.renderWorld(world);
 	}
 	else if (e.data.msg==="agentpath")
 	{		
@@ -65,8 +67,8 @@ Core.prototype.run = function(canvas)
 	    agentPaths[e.data.agent].complete = e.data.complete;
 	    agentPaths[e.data.agent].modifications = e.data.modifications;
 	    if (world != null)
-		Renderer.renderWorld(canvas,world,blockWidth,blockHeight);
-	    Renderer.renderPaths(canvas,agentPaths,blockWidth,blockHeight)
+		renderer.renderWorld(world);
+	    renderer.renderPaths(agentPaths)
 	}
     };
     

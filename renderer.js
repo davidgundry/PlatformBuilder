@@ -1,4 +1,4 @@
-var debug = false;	
+var debug = 0;	
 
 function Path(offsetX,offsetY)
 {
@@ -10,81 +10,87 @@ Path.prototype.modifications = [];
 Path.prototype.points = [];
 Path.prototype.complete = false;
 
-function Renderer()
+function Renderer(canvas,width,height,depth,blockWidth=1, blockHeight=1)
 {
+    this.mapWidth = blockWidth*width + 100;
+    this.blockWidth = blockWidth;
+    this.blockHeight = blockHeight;
+    this.canvas = canvas;
+    this.canvas.width= this.mapWidth*height;
+    this.canvas.height= depth*blockHeight;
+    this.context = canvas.getContext("2d");
 }
 
-Renderer.renderWorld = function(canvas,data,blockWidth=1, blockHeight=1)
+Renderer.prototype.renderWorld = function(data)
 {
-    canvas.width=data.length * blockWidth;
-    canvas.height=data[0].length * blockHeight;
-    
-    var context = canvas.getContext("2d");
-    
-    context.fillStyle = "#eee";    
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    this.context.fillStyle = "#eee";    
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     
-    for (var i=0;i<data.length;i++)
+    for (var j=0;j<data[0].length;j++)
     {
-	for (var j=0;j<data[0].length;j++)
+	this.context.fillStyle = "#fee";    
+	this.context.fillRect(this.mapWidth*j, 0, this.blockWidth*data.length, this.canvas.height);
+	
+	for (var i=0;i<data.length;i++)
 	{
-	    switch(data[i][j])
+	    for (var k=0;k<data[0][0].length;k++)
 	    {
-		case 1:
-		    context.fillStyle = "#000";  
-		    context.fillRect(i*blockWidth, j*blockHeight, blockWidth, blockHeight);
-		    break;
-		case 2:
-		    context.fillStyle = "#f00";  
-		    context.fillRect(i*blockWidth, j*blockHeight, blockWidth, blockHeight);
-		    break;
-		case 3:
-		    context.fillStyle = "#0f0";  
-		    context.fillRect(i*blockWidth, j*blockHeight, blockWidth, blockHeight);
-		    break;
-		case 4:
-		    context.fillStyle = "#00f";  
-		    context.fillRect(i*blockWidth, j*blockHeight, blockWidth, blockHeight);
-		    break;
+		switch(data[i][j][k])
+		{
+		    case 1:
+			this.context.fillStyle = "#000";  
+			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			break;
+		    case 2:
+			this.context.fillStyle = "#f00";  
+			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			break;
+		    case 3:
+			this.context.fillStyle = "#0f0";  
+			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			break;
+		    case 4:
+			this.context.fillStyle = "#00f";  
+			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			break;
+		}
 	    }
 	}
     }
-    if (debug)
+    if (debug>0)
 	console.log("Rendering finished");
 }
 
-Renderer.renderPaths = function(canvas,paths,blockWidth=1, blockHeight=1)
+Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 {
-      var context = canvas.getContext("2d");
-
-      var halfWidth = Math.round(blockWidth/2);
-      var halfHeight = Math.round(blockHeight/2);
+      var halfWidth = Math.round(this.blockWidth/2);
+      var halfHeight = Math.round(this.blockHeight/2);
       
       for (var p=0;p<paths.length;p++)
       {     
 	  if (paths[p].complete)
-	      context.strokeStyle="#f0f";
+	      this.context.strokeStyle="#f0f";
 	  else
-	      context.strokeStyle="#00f";
+	      this.context.strokeStyle="#00f";
 	  for (var i=paths[p].points.length-2;i>=0;i--)
 	  {
-	      context.beginPath();
-	      context.moveTo(paths[p].offsetX+blockWidth*(paths[p].points[i+1].x)+halfWidth,paths[p].offsetY+blockHeight*(paths[p].points[i+1].y)+halfHeight);
-	      context.lineTo(paths[p].offsetX+blockWidth*(paths[p].points[i].x)+halfWidth,paths[p].offsetY+blockHeight*(paths[p].points[i].y)+halfHeight);
-	      context.stroke();
+	      this.context.beginPath();
+	      this.context.moveTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i+1].x)+halfWidth + paths[p].points[i+1].y*this.mapWidth,paths[p].offsetY+blockHeight*(paths[p].points[i+1].z)+halfHeight);
+	      this.context.lineTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i].x)+halfWidth + +halfWidth + paths[p].points[i].y*this.mapWidth,paths[p].offsetY+blockHeight*(paths[p].points[i].z)+halfHeight);
+	      this.context.stroke();
 	  }
 	  
-	  var modDotWidth = Math.round(blockWidth/5);
-	  var modDotHeight = Math.round(blockHeight/5);
+	  var modDotWidth = Math.round(this.blockWidth/5);
+	  var modDotHeight = Math.round(this.blockHeight/5);
 	  
 	  for (var i=paths[p].modifications.length-1;i>=0;i--)
 	  {
 	      if (paths[p].complete)
-		  context.fillStyle="#f0f";
+		  this.context.fillStyle="#f0f";
 	      else
-		  context.fillStyle="#00f";
-	      context.fillRect(paths[p].modifications[i][0]*blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), paths[p].modifications[i][1]*blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);
+		  this.context.fillStyle="#00f";
+	      this.context.fillRect(paths[p].modifications[i][0]*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), paths[p].modifications[i][2]*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);
 	  }
       }
 }
