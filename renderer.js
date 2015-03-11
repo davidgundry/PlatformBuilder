@@ -64,7 +64,7 @@ Renderer.renderPaths = function(canvas,paths,blockWidth=1, blockHeight=1)
       for (var p=0;p<paths.length;p++)
       {     
 	  if (paths[p].complete)
-	      context.strokeStyle="#f00";
+	      context.strokeStyle="#f0f";
 	  else
 	      context.strokeStyle="#00f";
 	  for (var i=paths[p].points.length-2;i>=0;i--)
@@ -81,7 +81,7 @@ Renderer.renderPaths = function(canvas,paths,blockWidth=1, blockHeight=1)
 	  for (var i=paths[p].modifications.length-1;i>=0;i--)
 	  {
 	      if (paths[p].complete)
-		  context.fillStyle="#f00";
+		  context.fillStyle="#f0f";
 	      else
 		  context.fillStyle="#00f";
 	      context.fillRect(paths[p].modifications[i][0]*blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), paths[p].modifications[i][1]*blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);

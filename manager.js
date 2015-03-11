@@ -124,7 +124,7 @@ Manager.createWorld = function(width,height)
     world.push([]);
     for (var j=0;j<height;j++)
     {
-      world[i][j] = Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
+      world[i][j] = 0;//Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
     }
   }
   
@@ -146,7 +146,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
 	else
 	    console.log("Agent "+workerIndex+" has a current-best solution");
     }
-    /*
+    
     var finished = true;
     for (var i=0;i<this.agents.length;i++)
 	if (!this.agents[i].complete)
@@ -156,7 +156,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
 	}
 
     if (finished)
-	this.runAgents();*/
+	this.runAgents();
 }
 
 Manager.worldState = function(world,modifications,x,y)

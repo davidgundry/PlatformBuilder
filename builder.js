@@ -100,10 +100,20 @@ Builder.prototype.step = function()
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
 	this.closedList.push(this.currentNode);
 	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
-	for (var i=0;i<newNodes.length;i++)
+	for (var i=newNodes.length-1;i>=0;i--)
 	{
 	  newNodes[i].heuristic = newNodes[i].cost + Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
+	  for (var j=this.closedList.length-1;j>=0;j--)
+	  {
+	      if (Builder.Node.equals(newNodes[i],this.closedList[j]))
+		if ((newNodes[i].heuristic) >= (this.closedList[j].heuristic))
+		{
+		    newNodes.splice(i,1);
+		    break;
+		}
+	  }
+		
 	}
 	this.fringe = Builder.sort(this.fringe,newNodes);
 	this.currentNode = this.fringe[0];
@@ -165,7 +175,7 @@ Builder.Node = function(state,cost,action)
 
 Builder.Node.equals = function(n1,n2)
 {
-  return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.m == n2.state.m))
+  return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.m == n2.state.m));
 }
 
 Builder.Node.prototype.heuristic = 0;

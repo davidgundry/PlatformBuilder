@@ -1,4 +1,4 @@
-function Core(width=50,height=50,agents=4,updateCountdown=100,activityTime=10000)
+function Core(width=20,height=20,agents=10,updateCountdown=100,activityTime=100000)
 {
     this.debug = true;
 
