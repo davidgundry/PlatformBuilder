@@ -347,6 +347,16 @@ Manager.prototype.moveBy = function(agentID,x,z)
     return true;
 }
 
+Manager.prototype.buildDirection = function(agentID,x,y,z)
+{
+    if (Manager.buildable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+y,this.agents[agentID].position.z+z))
+    {
+	this.world[this.agents[agentID].position.x+x][this.agents[agentID].position.y+y][this.agents[agentID].position.z+z] = 2;
+	return true;
+    }
+    return false; 
+}
+
 Manager.prototype.moveUp = function(agentID)
 {
     return this.moveBy(agentID,0,-1);
@@ -365,16 +375,6 @@ Manager.prototype.moveDown = function(agentID)
 Manager.prototype.moveLeft = function(agentID)
 {
     return this.moveBy(agentID,-1,0);
-}
-
-Manager.prototype.buildDirection = function(agentID,x,y,z)
-{
-    if (Manager.buildable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+y,this.agents[agentID].position.z+z))
-    {
-	this.world[this.agents[agentID].position.x+x][this.agents[agentID].position.y+y][this.agents[agentID].position.z+z] = 2;
-	return true;
-    }
-    return false; 
 }
 
 Manager.prototype.buildUp = function(agentID)
