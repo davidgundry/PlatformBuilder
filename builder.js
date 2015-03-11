@@ -246,13 +246,13 @@ Builder.moveLeft = function(node,world)
 
 Builder.buildUp = function(node,world)
 {
-    if (node.state.p.y > 0)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1))
+    if (node.state.p.z > 0)
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y-1]);
+	  n.push([node.state.p.x,node.state.p.y,node.state.p.z-1]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,4);
 	}
     return null;
@@ -261,12 +261,12 @@ Builder.buildUp = function(node,world)
 Builder.buildRight = function(node,world)
 {
     if (node.state.p.x < world.length-1)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x+1,node.state.p.y]);
+	  n.push([node.state.p.x+1,node.state.p.y,node.state.p.z]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,5);
 	}
     return null;
@@ -274,13 +274,13 @@ Builder.buildRight = function(node,world)
 
 Builder.buildDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-1)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
+    if (node.state.p.z < world[0][0].length-1)
+	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y+1]);
+	  n.push([node.state.p.x,node.state.p.y,node.state.p.z+1]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,6);
 	}
     return null;
@@ -289,12 +289,12 @@ Builder.buildDown = function(node,world)
 Builder.buildLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
-	  n.push([node.state.p.x-1,node.state.p.y]);
+	  n.push([node.state.p.x-1,node.state.p.y,node.state.p.z]);
 	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,7);
 	}
     return null;
