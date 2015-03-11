@@ -1,4 +1,4 @@
-function Core(width=10,height=5,depth=10,agents=1,updateCountdown=100,activityTime=10000000)
+function Core(width=10,height=5,depth=10,agents=5,updateCountdown=100,activityTime=10000000)
 {
     this.debug = true;
 
@@ -37,6 +37,14 @@ Core.prototype.run = function(canvas)
     var blockWidth = Math.max(1,Math.floor(maxWidth/this.width));
     var blockHeight = Math.max(1,Math.floor(maxHeight/this.depth));
     var renderer = new Renderer(canvas,this.width,this.height,this.depth,blockWidth,blockHeight);
+    var renderer3D = new Renderer.Renderer3D();
+    
+    var animate = function()
+    {
+	requestAnimationFrame(animate);
+	renderer3D.render();		
+	renderer3D.update();
+    }
     
     var agentPaths = [];
     for (var i=0;i<this.numAgents;i++)
@@ -58,6 +66,8 @@ Core.prototype.run = function(canvas)
 
 	    world = e.data.world;
 	    renderer.renderWorld(world);
+	    renderer3D.init(world);
+	    animate();
 	}
 	else if (e.data.msg==="agentpath")
 	{		

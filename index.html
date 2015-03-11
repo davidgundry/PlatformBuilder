@@ -5,11 +5,13 @@
 	<title>Builder</title>
 	<script type="text/javascript" src="renderer.js"></script>
 	<script type="text/javascript" src ="core.js"></script>
-	<script type="text/javascript" src ="agent.js"></script>
+	<script src="three/three.min.js"></script>
+	<script src="three/OrbitControls.js"></script>
     </head>
 
     <body style="margin:0; background-color:#333;">
 	<canvas id="outputTarget" onClick="pause()"></canvas>
+	<div id="ThreeJS" style="z-index: 1;"></div>
 	<script type="text/javascript">
 	    var c = new Core();
 	    c.run(document.getElementById("outputTarget"));

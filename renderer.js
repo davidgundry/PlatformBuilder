@@ -109,3 +109,103 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
       }
 }
    
+   
+Renderer.Renderer3D = function()
+{
+    this.container = null;
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.controls = null;
+}
+		
+Renderer.Renderer3D.prototype.init = function(world) 
+{
+    this.scene = new THREE.Scene();
+    
+    var width = 400;
+    var height = 300;
+    var angle = 45;
+    var aspectRatio = width / height;
+    var near = 0.1;
+    var far = 20000;
+    
+    this.camera = new THREE.PerspectiveCamera(angle, aspectRatio, near, far);
+    this.scene.add(this.camera);
+    this.camera.position.set(0,200,-150);
+    this.camera.lookAt(this.scene.position);	
+
+    this.renderer = new THREE.WebGLRenderer({antialias:true});
+    this.renderer.setSize(width, height);
+    this.container = document.getElementById('ThreeJS');
+    this.container.appendChild(this.renderer.domElement);
+
+    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+
+    this.scene.add(new THREE.AmbientLight(0xffffff));
+    this.createWorld(world);
+}
+
+Renderer.Renderer3D.prototype.createWorld = function(world)
+{
+    var cubeMaterialArray = [];
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff5500 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff0033 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff3333 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff1111 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff6622 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff2266 } ) );
+    var cubeMaterials = new THREE.MeshFaceMaterial(cubeMaterialArray);
+	
+    var goalMaterialArray = [];
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x3300ff } ) );
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x0033ff } ) );
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x3333ff } ) );
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x6600ff } ) );
+    goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x0066ff } ) );
+    var goalMaterials = new THREE.MeshFaceMaterial(goalMaterialArray);
+    
+    var originMaterialArray = [];
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x33ff00 } ) );
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x00ff33 } ) );
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x33ff33 } ) );
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x66ff00 } ) );
+    originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x00ff66 } ) );
+    var originMaterials = new THREE.MeshFaceMaterial(originMaterialArray);
+    var boxGeometry = new THREE.BoxGeometry( 5, 5, 5, 1, 1, 1 );
+
+    var cube = null;
+    
+    for (var i=0;i<world.length;i++)
+	for (var j=0;j<world[0].length;j++)
+	  for (var k=0;k<world[0][0].length;k++)
+	    if (world[i][j][k] != 0)
+	    {
+	      switch (world[i][j][k])
+	      {
+		  case 2:
+		      cube = new THREE.Mesh(boxGeometry,cubeMaterials);
+		      break;
+		  case 3:
+		      cube = new THREE.Mesh(boxGeometry,originMaterials);
+		      break;
+		  case 4:
+		      cube = new THREE.Mesh(boxGeometry,goalMaterials);
+		      break;
+	      }
+	      cube.position.set(5*i, 5*j, 5*k);
+	      this.scene.add(cube);
+	    }
+}
+
+Renderer.Renderer3D.prototype.update = function()
+{
+    this.controls.update();
+}
+
+Renderer.Renderer3D.prototype.render = function() 
+{	
+    this.renderer.render(this.scene, this.camera);
+}
