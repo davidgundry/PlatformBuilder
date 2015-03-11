@@ -262,102 +262,127 @@ Manager.prototype.action = function(actionID,agentID)
     case 3:
       this.agents[agentID].position.x--;
       break;
-    // Build Up
     case 4:
-      if (((this.agents[agentID].position.z-1 < 0)
-	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)) 
-	&& (debug>0))
-      {
-	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z-1)+"]");
-      }
-      else if (Manager.buildable(this.world[this.agents[agentID].position.x]
-					    [this.agents[agentID].position.y]
-					    [this.agents[agentID].position.z-1]))
-      {
-	  this.world[this.agents[agentID].position.x]
-		    [this.agents[agentID].position.y]
-		    [this.agents[agentID].position.z-1] = 2;
-      }
-      else
-	  return false;
-      break;
+	if (!this.buildUp(agentID))
+	    return false;
+	break;
     case 5:
-      if (((this.agents[agentID].position.x+1 < 0)
-	|| (this.agents[agentID].position.x+1 >= this.world.length))
-	&& (debug>0))
-      {
-	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
-      }
-      else if (Manager.buildable(this.world[this.agents[agentID].position.x+1]
-					    [this.agents[agentID].position.y]
-					    [this.agents[agentID].position.z]))
-      {
-	  this.world[this.agents[agentID].position.x+1]
-		    [this.agents[agentID].position.y]
-		    [this.agents[agentID].position.z] = 2;
-      }
-      else
-	  return false;
-      break;
+	if (!this.buildRight(agentID))
+	    return false;
+	break;
     case 6:
-       if (((this.agents[agentID].position.z+1 < 0)
-	 || (this.agents[agentID].position.z+1 >= this.world[0][0].length))
-	 && (debug>0))
-       {
-	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z+1)+"]");
-       }
-      else if (Manager.buildable(this.world[this.agents[agentID].position.x]
-					    [this.agents[agentID].position.y]
-					    [this.agents[agentID].position.z+1]))
-      {
-	  this.world[this.agents[agentID].position.x]
-		    [this.agents[agentID].position.y]
-		    [this.agents[agentID].position.z+1] = 2;
-      }
-      else
-	  return false;
-      break;
+	if (!this.buildDown(agentID))
+	    return false;
+	break;
     case 7:
-      if (((this.agents[agentID].position.x-1 < 0)
-	|| (this.agents[agentID].position.x-1 >= this.world.length))
-	&& (debug>0))
-      {
-	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x-1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
-      }
-      else if (Manager.buildable(this.world[this.agents[agentID].position.x-1]
-					    [this.agents[agentID].position.y]
-					    [this.agents[agentID].position.z]))
-      {
-	  this.world[this.agents[agentID].position.x-1]
-		    [this.agents[agentID].position.y]
-		    [this.agents[agentID].position.z] = 2;
-      }
-      else
+	if (!this.buildLeft(agentID))
+	    return false;
+	break;
+    case 8:
+	if (!this.buildStepUp(agentID))
 	  return false;
-      break;
-      
-      
-      case 8:
-	  if (!this.BuildStepUp(agentID))
-	    return false;
-      break;
-      case 9:
-	  if (!this.BuildStepRight(agentID))
-	    return false;
-      break;
-      case 10:
-	  if (!this.BuildStepDown(agentID))
-	    return false;
-      break;
-      case 11:
-	  if (!this.BuildStepLeft(agentID))
-	    return false;
-      break;
+	break;
+    case 9:
+	if (!this.buildStepRight(agentID))
+	  return false;
+	break;
+    case 10:
+	if (!this.buildStepDown(agentID))
+	  return false;
+	break;
+    case 11:
+	if (!this.buildStepLeft(agentID))
+	  return false;
+	break;
   }
   return true;
 }
 
-Manager.prototype.BuildStepUp = function(agentID)
+Manager.prototype.buildUp = function(agentID)
+{
+    if (((this.agents[agentID].position.z-1 < 0)
+	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)) 
+	&& (debug>0))
+    {
+    console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z-1)+"]");
+    }
+    else if (Manager.buildable(this.world[this.agents[agentID].position.x]
+					[this.agents[agentID].position.y]
+					[this.agents[agentID].position.z-1]))
+    {
+      this.world[this.agents[agentID].position.x]
+		[this.agents[agentID].position.y]
+		[this.agents[agentID].position.z-1] = 2;
+    }
+    else
+      return false; 
+    return true;
+}
+
+Manager.prototype.buildRight = function(agentID)
+{
+    if (((this.agents[agentID].position.x+1 < 0)
+      || (this.agents[agentID].position.x+1 >= this.world.length))
+      && (debug>0))
+    {
+      console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
+    }
+    else if (Manager.buildable(this.world[this.agents[agentID].position.x+1]
+					  [this.agents[agentID].position.y]
+					  [this.agents[agentID].position.z]))
+    {
+	this.world[this.agents[agentID].position.x+1]
+		  [this.agents[agentID].position.y]
+		  [this.agents[agentID].position.z] = 2;
+    }
+    else
+	return false;
+    return true;
+}
+
+Manager.prototype.buildDown = function(agentID)
+{
+  if (((this.agents[agentID].position.z+1 < 0)
+      || (this.agents[agentID].position.z+1 >= this.world[0][0].length))
+      && (debug>0))
+    {
+    console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+this.agents[agentID].position.y+"][" + (this.agents[agentID].position.z+1)+"]");
+    }
+    else if (Manager.buildable(this.world[this.agents[agentID].position.x]
+					[this.agents[agentID].position.y]
+					[this.agents[agentID].position.z+1]))
+    {
+	this.world[this.agents[agentID].position.x]
+		  [this.agents[agentID].position.y]
+		  [this.agents[agentID].position.z+1] = 2;
+    }
+    else
+	return false;
+    return true;
+}
+
+Manager.prototype.buildLeft = function(agentID)
+{
+    if (((this.agents[agentID].position.x-1 < 0)
+      || (this.agents[agentID].position.x-1 >= this.world.length))
+      && (debug>0))
+    {
+      console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x-1)+"]["+this.agents[agentID].position.y+"]["+this.agents[agentID].position.z+"]");
+    }
+    else if (Manager.buildable(this.world[this.agents[agentID].position.x-1]
+					  [this.agents[agentID].position.y]
+					  [this.agents[agentID].position.z]))
+    {
+	this.world[this.agents[agentID].position.x-1]
+		  [this.agents[agentID].position.y]
+		  [this.agents[agentID].position.z] = 2;
+    }
+    else
+	return false;
+    return true;
+}
+
+Manager.prototype.buildStepUp = function(agentID)
 {
       if (((this.agents[agentID].position.z-1 < 0)
 	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)
@@ -379,7 +404,7 @@ Manager.prototype.BuildStepUp = function(agentID)
       return true;
 }
 
-Manager.prototype.BuildStepRight = function(agentID)
+Manager.prototype.buildStepRight = function(agentID)
 {
       if (((this.agents[agentID].position.x+1 < 0)
 	|| (this.agents[agentID].position.x+1 >= this.world.length)
@@ -401,7 +426,7 @@ Manager.prototype.BuildStepRight = function(agentID)
       return true;
 }
 
-Manager.prototype.BuildStepDown = function(agentID)
+Manager.prototype.buildStepDown = function(agentID)
 {
     if (((this.agents[agentID].position.z+1 < 0)
 	|| (this.agents[agentID].position.z+1 >= this.world[0][0].length)
@@ -423,7 +448,7 @@ Manager.prototype.BuildStepDown = function(agentID)
     return true;
 }
 
-Manager.prototype.BuildStepLeft = function(agentID)
+Manager.prototype.buildStepLeft = function(agentID)
 {
       if (((this.agents[agentID].position.x-1 < 0)
 	|| (this.agents[agentID].position.x-1 >= this.world.length)

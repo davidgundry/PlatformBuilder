@@ -23,7 +23,7 @@ function Renderer(canvas,width,height,depth,blockWidth=1, blockHeight=1)
 
 Renderer.prototype.renderWorld = function(data)
 {
-    this.context.fillStyle = "#eee";    
+    this.context.fillStyle = "#333";    
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     
@@ -67,6 +67,9 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
       var halfWidth = Math.round(this.blockWidth/2);
       var halfHeight = Math.round(this.blockHeight/2);
       
+      var modDotWidth = Math.round(this.blockWidth/5);
+      var modDotHeight = Math.round(this.blockHeight/5);
+      
       for (var p=0;p<paths.length;p++)
       {     
 	  if (paths[p].complete)
@@ -83,8 +86,15 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 	      this.context.stroke();
 	  }
 	  
-	  var modDotWidth = Math.round(this.blockWidth/5);
-	  var modDotHeight = Math.round(this.blockHeight/5);
+	  // Draw a white dot where a path starts
+	  if (paths[p].points.length > 0)
+	  {
+	      this.context.fillStyle="#fff";
+	      this.context.fillRect(paths[p].points[paths[p].points.length-1].x*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2) + paths[p].points[paths[p].points.length-1].y*this.mapWidth, 
+			paths[p].points[paths[p].points.length-1].z*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2),
+			modDotWidth,
+			modDotHeight);
+	  }
 	  
 	  for (var i=paths[p].modifications.length-1;i>=0;i--)
 	  {
