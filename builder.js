@@ -1,4 +1,4 @@
-var debug = 2;
+var debug = 1;
 
 var builder = null
 
@@ -109,7 +109,7 @@ Builder.prototype.step = function()
 		if ((newNodes[i].heuristic) >= (this.closedList[j].heuristic))
 		{
 		    newNodes.splice(i,1);
-		    return true;
+		    break;
 		}
 	  }
 		
