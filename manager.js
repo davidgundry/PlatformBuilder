@@ -76,7 +76,7 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:3,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:2,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
@@ -146,7 +146,6 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
     this.agents[workerIndex].modifications = modifications;
     this.agents[workerIndex].complete = complete;
 	    
-   
     if (debug>1)
     {
 	if (complete)
@@ -155,15 +154,7 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
 	    console.log("Agent "+workerIndex+" has a current-best solution");
     }
     
-    var finished = true;
-    for (var i=0;i<this.agents.length;i++)
-	if (!this.agents[i].complete)
-	{
-	    finished = false;
-	    break;
-	}
-
-    if (finished)
+    if (Manager.agentsAllComplete(this.agents))
 	this.runAgents();
 }
 
