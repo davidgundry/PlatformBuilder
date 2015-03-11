@@ -23,10 +23,10 @@ function Builder(world,origin,goal)
   this.goal = goal;
 
 
-  if (!Builder.inWorldBounds(origin.x,origin.y,world) && (debug>0))
-    console.log("ERROR: Origin " + origin.x +", "+origin.y +" not in world bounds.");
-  if (!Builder.inWorldBounds(goal.x,goal.y,world) && (debug>0))
-    console.log("ERROR: Goal " + goal.x +", "+goal.y +" not in world bounds.");
+  if (!Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (debug>0))
+    console.log("ERROR: Origin " + origin.x +", "+origin.y +", "+origin.z + " not in world bounds.");
+  if (!Builder.inWorldBounds(goal.x,goal.y,goal.z,world) && (debug>0))
+    console.log("ERROR: Goal " + goal.x +", "+goal.y +", "+goal.z + " not in world bounds.");
   
   this.fringe = [new Builder.Node({p:origin,m:[]},0,null)];
   this.closedList = [];
@@ -34,9 +34,9 @@ function Builder(world,origin,goal)
 }
 Builder.prototype.stepNo = 0;
 
-Builder.inWorldBounds = function(x,y,world)
+Builder.inWorldBounds = function(x,y,z,world)
 {
-    return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0));
+    return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0) && (z < world[0][0].length) && (z >= 0));
 }
 
 Builder.run = function(id,updateCountdown)
@@ -96,7 +96,7 @@ Builder.prototype.step = function()
     if (this.currentNode != null)
     {
 	if (debug>1)
-	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length);
+	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + ","+this.currentNode.state.p.z + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length);
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
 	this.closedList.push(this.currentNode);
 	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
@@ -163,7 +163,7 @@ Builder.expand = function(node,actions,goal,world)
 
 Builder.goalTest = function(state,goal)
 {
-  return ((state.p.x==goal.x) && (state.p.y==goal.y));
+  return ((state.p.x==goal.x) && (state.p.y==goal.y) && (state.p.z==goal.z));
 }
 
 Builder.Node = function(state,cost,action)
@@ -175,7 +175,7 @@ Builder.Node = function(state,cost,action)
 
 Builder.Node.equals = function(n1,n2)
 {
-  return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.m == n2.state.m));
+  return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.p.z == n2.state.p.z) && (n1.state.m == n2.state.m));
 }
 
 Builder.Node.prototype.heuristic = 0;
@@ -185,18 +185,19 @@ Builder.heuristic = function(state,goal)
 {
     var xdiff = goal.x - state.p.x;
     var ydiff = goal.y - state.p.y;
+    var zdiff = goal.z - state.p.z;
     //return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
-    return Math.abs(xdiff)+Math.abs(ydiff);
+    return Math.abs(xdiff)+Math.abs(ydiff)+Math.abs(zdiff);
 }
 
-Builder.walkable = function(world,modifications,x,y)
+Builder.walkable = function(world,modifications,x,y,z)
 {
   for (var i=0;i<modifications.length;i++)
   {
-      if ((modifications[i][0] == x) && (modifications[i][1] == y))
+      if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][2] == z))
 	return true;
   }
-  return (!world[x][y]==0);
+  return (!world[x][y][z]==0);
 }
 
 Builder.moveUp = function(node,world)
@@ -320,7 +321,7 @@ Builder.prototype.summary = function(solution,steps,time)
   if (solution != null)
   {
     if (solution.state != null)
-      console.log(time + "ms Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
+      console.log(time + "ms Solution: p x:"+solution.state.p.x+" y:"+solution.state.p.y + " z:"+solution.state.p.z " in "+steps+" steps. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
   }
   else
     console.log("Failure. Fringe length: "+ this.fringe.length + ". Closed list length: "+ this.closedList.length);
