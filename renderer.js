@@ -90,7 +90,7 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 		  this.context.fillStyle="#f0f";
 	      else
 		  this.context.fillStyle="#00f";
-	      this.context.fillRect(paths[p].modifications[i][0]*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), paths[p].modifications[i][2]*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);
+	      this.context.fillRect(paths[p].modifications[i][0]*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2) + paths[p].modifications[i][1]*this.mapWidth, paths[p].modifications[i][2]*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth, modDotHeight);
 	  }
       }
 }

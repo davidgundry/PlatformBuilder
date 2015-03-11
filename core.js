@@ -1,4 +1,4 @@
-function Core(width=5,height=5,depth=5,agents=1,updateCountdown=100,activityTime=100000)
+function Core(width=5,height=5,depth=5,agents=1,updateCountdown=100,activityTime=1000)
 {
     this.debug = true;
 
@@ -15,7 +15,7 @@ function Core(width=5,height=5,depth=5,agents=1,updateCountdown=100,activityTime
      */
     this.activityTime = activityTime;
     
-    this.manager =  new Worker("manager.js");
+    this.manager = new Worker("manager.js");
     this.paused = false;
 }
 
