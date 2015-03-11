@@ -76,8 +76,10 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 	  for (var i=paths[p].points.length-2;i>=0;i--)
 	  {
 	      this.context.beginPath();
-	      this.context.moveTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i+1].x)+halfWidth + paths[p].points[i+1].y*this.mapWidth,paths[p].offsetY+blockHeight*(paths[p].points[i+1].z)+halfHeight);
-	      this.context.lineTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i].x)+halfWidth + +halfWidth + paths[p].points[i].y*this.mapWidth,paths[p].offsetY+blockHeight*(paths[p].points[i].z)+halfHeight);
+	      this.context.moveTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i+1].x)+halfWidth + paths[p].points[i+1].y*this.mapWidth,
+				  paths[p].offsetY+blockHeight*(paths[p].points[i+1].z)+halfHeight);
+	      this.context.lineTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i].x)+halfWidth + paths[p].points[i].y*this.mapWidth,
+				  paths[p].offsetY+blockHeight*(paths[p].points[i].z)+halfHeight);
 	      this.context.stroke();
 	  }
 	  
