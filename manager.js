@@ -262,6 +262,7 @@ Manager.prototype.action = function(actionID,agentID)
     case 3:
       this.agents[agentID].position.x--;
       break;
+    // Build Up
     case 4:
       if (((this.agents[agentID].position.z-1 < 0)
 	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)) 
@@ -334,8 +335,114 @@ Manager.prototype.action = function(actionID,agentID)
       else
 	  return false;
       break;
+      
+      
+      case 8:
+	  if (!this.BuildStepUp(agentID))
+	    return false;
+      break;
+      case 9:
+	  if (!this.BuildStepRight(agentID))
+	    return false;
+      break;
+      case 10:
+	  if (!this.BuildStepDown(agentID))
+	    return false;
+      break;
+      case 11:
+	  if (!this.BuildStepLeft(agentID))
+	    return false;
+      break;
   }
   return true;
+}
+
+Manager.prototype.BuildStepUp = function(agentID)
+{
+      if (((this.agents[agentID].position.z-1 < 0)
+	|| (this.agents[agentID].position.z-1 >= this.world[0][0].length)
+	|| (this.agents[agentID].position.y+1 >= this.world[0].length)) 
+	&& (debug>0))
+      {
+	console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+(this.agents[agentID].position.y+1)+"][" + (this.agents[agentID].position.z-1)+"]");
+      }
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x]
+					    [this.agents[agentID].position.y+1]
+					    [this.agents[agentID].position.z-1]))
+      {
+	  this.world[this.agents[agentID].position.x]
+		    [this.agents[agentID].position.y+1]
+		    [this.agents[agentID].position.z-1] = 2;
+      }
+      else
+	  return false;
+      return true;
+}
+
+Manager.prototype.BuildStepRight = function(agentID)
+{
+      if (((this.agents[agentID].position.x+1 < 0)
+	|| (this.agents[agentID].position.x+1 >= this.world.length)
+	|| (this.agents[agentID].position.y+1 >= this.world[0].length)) 
+	&& (debug>0))
+      {
+	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x+1)+"]["+(this.agents[agentID].position.y+1)+"]["+this.agents[agentID].position.z+"]");
+      }
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x+1]
+					    [this.agents[agentID].position.y+1]
+					    [this.agents[agentID].position.z]))
+      {
+	  this.world[this.agents[agentID].position.x+1]
+		    [this.agents[agentID].position.y+1]
+		    [this.agents[agentID].position.z] = 2;
+      }
+      else
+	  return false;
+      return true;
+}
+
+Manager.prototype.BuildStepDown = function(agentID)
+{
+    if (((this.agents[agentID].position.z+1 < 0)
+	|| (this.agents[agentID].position.z+1 >= this.world[0][0].length)
+	|| (this.agents[agentID].position.y+1 >= this.world[0].length)) 
+	&& (debug>0))
+      {
+      console.log("ERROR: tried to access world["+this.agents[agentID].position.x+"]["+(this.agents[agentID].position.y+1)+"][" + (this.agents[agentID].position.z+1)+"]");
+      }
+    else if (Manager.buildable(this.world[this.agents[agentID].position.x]
+					  [this.agents[agentID].position.y+1]
+					  [this.agents[agentID].position.z+1]))
+    {
+	this.world[this.agents[agentID].position.x]
+		  [this.agents[agentID].position.y+1]
+		  [this.agents[agentID].position.z+1] = 2;
+    }
+    else
+	return false;
+    return true;
+}
+
+Manager.prototype.BuildStepLeft = function(agentID)
+{
+      if (((this.agents[agentID].position.x-1 < 0)
+	|| (this.agents[agentID].position.x-1 >= this.world.length)
+	|| (this.agents[agentID].position.y+1 >= this.world[0].length)) 
+	&& (debug>0))
+      {
+	console.log("ERROR: tried to access world[" + (this.agents[agentID].position.x-1)+"]["+(this.agents[agentID].position.y+1)+"]["+this.agents[agentID].position.z+"]");
+      }
+      else if (Manager.buildable(this.world[this.agents[agentID].position.x-1]
+					    [this.agents[agentID].position.y+1]
+					    [this.agents[agentID].position.z]))
+      {
+	  this.world[this.agents[agentID].position.x-1]
+		    [this.agents[agentID].position.y+1]
+		    [this.agents[agentID].position.z] = 2;
+      }
+      else
+	  return false;
+      return true;
 }
 
 Manager.moveUp = function(world)
