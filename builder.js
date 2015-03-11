@@ -192,12 +192,40 @@ Builder.heuristic = function(state,goal)
 
 Builder.walkable = function(world,modifications,x,y,z)
 {
+  var floor = false;
+  var headroom = true;
+
+  if (world[x][y][z]!=0)
+      floor = true;
+  if (world[x][y+1][z]!=0)
+      headroom = false;
+  if (world[x][y+2][z]!=0)
+      headroom = false;
+  if (!headroom)
+    return false;
+  else
+      for (var i=0;i<modifications.length;i++)
+      {
+	  if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][2] == z))
+	    floor = true;
+	  if ((modifications[i][0] == x) && (modifications[i][1] == y+1) && (modifications[i][2] == z))
+	    headroom = false;
+	  if ((modifications[i][0] == x) && (modifications[i][1] == y+2) && (modifications[i][2] == z))
+	    headroom = false;
+      }
+      
+  return (floor && headroom);
+  
+}
+
+Builder.buildable = function(world,modifications,x,y,z)
+{
   for (var i=0;i<modifications.length;i++)
   {
       if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][2] == z))
-	return true;
+	return false;
   }
-  return (!world[x][y][z]==0);
+  return (world[x][y][z]==0);
 }
 
 Builder.moveUp = function(node,world)
@@ -247,7 +275,7 @@ Builder.moveLeft = function(node,world)
 Builder.buildUp = function(node,world)
 {
     if (node.state.p.z > 0)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
+	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -261,7 +289,7 @@ Builder.buildUp = function(node,world)
 Builder.buildRight = function(node,world)
 {
     if (node.state.p.x < world.length-1)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
+	if (Builder.buildable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -275,7 +303,7 @@ Builder.buildRight = function(node,world)
 Builder.buildDown = function(node,world)
 {
     if (node.state.p.z < world[0][0].length-1)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
+	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -289,7 +317,7 @@ Builder.buildDown = function(node,world)
 Builder.buildLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
+	if (Builder.buildable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -303,7 +331,7 @@ Builder.buildLeft = function(node,world)
 Builder.buildStepUp = function(node,world)
 {
     if ((node.state.p.z > 0) && (node.state.p.y < world[0].length-1))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
+	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -317,7 +345,7 @@ Builder.buildStepUp = function(node,world)
 Builder.buildStepRight = function(node,world)
 {
     if ((node.state.p.x < world.length-1) && (node.state.p.y < world[0].length-1))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
+	if (Builder.buildable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -331,7 +359,7 @@ Builder.buildStepRight = function(node,world)
 Builder.buildStepDown = function(node,world)
 {
     if ((node.state.p.z < world[0][0].length-1) && (node.state.p.y < world[0].length-1))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
+	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
@@ -345,7 +373,7 @@ Builder.buildStepDown = function(node,world)
 Builder.buildStepLeft = function(node,world)
 {
     if ((node.state.p.x > 0) && (node.state.p.y < world[0].length-1))
-	if (!Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
+	if (Builder.buildable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
 	{
 	  var n = [];
 	  for (var i=0;i<node.state.m.length;i++)
