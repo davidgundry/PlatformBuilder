@@ -72,11 +72,11 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
     for (var i=0;i<m.agents.length;i++)
     {
 	origin = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:Math.round(Math.random()*(m.world[0].length-1)),
+	  y:0,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:Math.round(Math.random()*(m.world[0].length-1)),
+	  y:3,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
@@ -230,9 +230,9 @@ Manager.prototype.runAgents = function()
 	else
 	{
 	    if (debug>0)
-	      console.log("Returning final output");
+		console.log("Returning final output");
 	    for (var i=0;i<this.agents.length;i++)
-	      this.agents[i].stop();
+		this.agents[i].stop();
 	    postMessage({msg:"done",world:this.world});
 	    close();
 	}
@@ -242,8 +242,33 @@ Manager.prototype.runAgents = function()
 Manager.buildable = function(tile)
 {
     if (tile ==0)
-      return true;
+	return true;
     return false;
+}
+
+Manager.inWorldBounds = function(x,y,z,world)
+{
+    return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0) && (z < world[0][0].length) && (z >= 0));
+}
+
+Manager.walkable = function(world,x,y,z)
+{
+    if (!Manager.inWorldBounds(x,y,z,world))
+      return false;
+    
+    var floor = false;
+    var headroom = true;
+
+    if (world[x][y][z]!=0)
+	floor = true;
+    if (y+1<world[0].length)
+	if (world[x][y+1][z]!=0)
+	    headroom = false;
+    if (y+2<world[0].length)  
+	if (world[x][y+2][z]!=0)
+	    headroom = false;
+	
+    return (floor && headroom);
 }
 
 Manager.prototype.action = function(actionID,agentID)
@@ -251,16 +276,20 @@ Manager.prototype.action = function(actionID,agentID)
     switch (actionID)
     {
 	case 0:
-	    this.agents[agentID].position.z--;
+	    if (!this.stepUp(agentID))
+		return false;
 	    break;
 	case 1:
-	    this.agents[agentID].position.x++;
-	    break;    
+	    if (!this.stepRight(agentID))
+		return false;
+	    break;
 	case 2:
-	    this.agents[agentID].position.z++;
+	    if (!this.stepDown(agentID))
+		return false;
 	    break;
 	case 3:
-	    this.agents[agentID].position.x--;
+	    if (!this.stepLeft(agentID))
+		return false;
 	    break;
 	case 4:
 	    if (!this.buildUp(agentID))
@@ -296,6 +325,71 @@ Manager.prototype.action = function(actionID,agentID)
 	    break;
     }
     return true;
+}
+
+
+Manager.prototype.stepUp = function(agentID)
+{
+    if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z--))
+      this.agents[agentID].position.z--;
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y-1,this.agents[agentID].position.z--))
+    {
+      this.agents[agentID].position.z--;
+      this.agents[agentID].position.y--;
+    }
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z--))
+    {
+      this.agents[agentID].position.z--;
+      this.agents[agentID].position.y++;
+    }
+}
+
+Manager.prototype.stepRight = function(agentID)
+{
+    if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y,this.agents[agentID].position.z))
+      this.agents[agentID].position.x--;
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y-1,this.agents[agentID].position.z))
+    {
+      this.agents[agentID].position.x--;
+      this.agents[agentID].position.y--;
+    }
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x++,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
+    {
+      this.agents[agentID].position.x--;
+      this.agents[agentID].position.y++;
+    }
+}
+
+Manager.prototype.stepDown = function(agentID)
+{
+    if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y,this.agents[agentID].position.z++))
+      this.agents[agentID].position.z++;
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y-1,this.agents[agentID].position.z++))
+    {
+      this.agents[agentID].position.z++;
+      this.agents[agentID].position.y--;
+    }
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z++))
+    {
+      this.agents[agentID].position.z++;
+      this.agents[agentID].position.y++;
+    }
+}
+
+Manager.prototype.stepLeft = function(agentID)
+{
+    if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y,this.agents[agentID].position.z))
+      this.agents[agentID].position.x--;
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y-1,this.agents[agentID].position.z))
+    {
+      this.agents[agentID].position.x--;
+      this.agents[agentID].position.y--;
+    }
+    else if (Manager.walkable(this.world,this.agents[agentID].position.x--,this.agents[agentID].position.y+1,this.agents[agentID].position.z))
+    {
+      this.agents[agentID].position.x--;
+      this.agents[agentID].position.y++;
+    }
 }
 
 Manager.prototype.buildUp = function(agentID)
