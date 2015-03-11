@@ -248,54 +248,54 @@ Manager.buildable = function(tile)
 
 Manager.prototype.action = function(actionID,agentID)
 {
-  switch (actionID)
-  {
-    case 0:
-      this.agents[agentID].position.z--;
-      break;
-    case 1:
-      this.agents[agentID].position.x++;
-      break;    
-    case 2:
-      this.agents[agentID].position.z++;
-      break;
-    case 3:
-      this.agents[agentID].position.x--;
-      break;
-    case 4:
-	if (!this.buildUp(agentID))
-	    return false;
-	break;
-    case 5:
-	if (!this.buildRight(agentID))
-	    return false;
-	break;
-    case 6:
-	if (!this.buildDown(agentID))
-	    return false;
-	break;
-    case 7:
-	if (!this.buildLeft(agentID))
-	    return false;
-	break;
-    case 8:
-	if (!this.buildStepUp(agentID))
-	  return false;
-	break;
-    case 9:
-	if (!this.buildStepRight(agentID))
-	  return false;
-	break;
-    case 10:
-	if (!this.buildStepDown(agentID))
-	  return false;
-	break;
-    case 11:
-	if (!this.buildStepLeft(agentID))
-	  return false;
-	break;
-  }
-  return true;
+    switch (actionID)
+    {
+	case 0:
+	    this.agents[agentID].position.z--;
+	    break;
+	case 1:
+	    this.agents[agentID].position.x++;
+	    break;    
+	case 2:
+	    this.agents[agentID].position.z++;
+	    break;
+	case 3:
+	    this.agents[agentID].position.x--;
+	    break;
+	case 4:
+	    if (!this.buildUp(agentID))
+		return false;
+	    break;
+	case 5:
+	    if (!this.buildRight(agentID))
+		return false;
+	    break;
+	case 6:
+	    if (!this.buildDown(agentID))
+		return false;
+	    break;
+	case 7:
+	    if (!this.buildLeft(agentID))
+		return false;
+	    break;
+	case 8:
+	    if (!this.buildStepUp(agentID))
+	      return false;
+	    break;
+	case 9:
+	    if (!this.buildStepRight(agentID))
+	      return false;
+	    break;
+	case 10:
+	    if (!this.buildStepDown(agentID))
+	      return false;
+	    break;
+	case 11:
+	    if (!this.buildStepLeft(agentID))
+	      return false;
+	    break;
+    }
+    return true;
 }
 
 Manager.prototype.buildUp = function(agentID)
