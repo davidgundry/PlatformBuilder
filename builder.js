@@ -1,4 +1,4 @@
-var debug = 1;	
+var debug = 2;
 
 var builder = null
 
@@ -45,9 +45,8 @@ Builder.run = function(id,updateCountdown)
     while (countdown >= 0)
     {
 	builder.stepNo++;
-	if (Builder.goalTest(builder.currentNode.state,builder.goal))
+	if (!builder.step())
 	  break;
-	builder.step();
 	if (countdown == 0)
 	{
 	    var c = Builder.createCandidate(builder.currentNode)
@@ -110,14 +109,17 @@ Builder.prototype.step = function()
 		if ((newNodes[i].heuristic) >= (this.closedList[j].heuristic))
 		{
 		    newNodes.splice(i,1);
-		    break;
+		    return true;
 		}
 	  }
 		
 	}
 	this.fringe = Builder.sort(this.fringe,newNodes);
 	this.currentNode = this.fringe[0];
+	return true;
     }
+    console.log("Current Node is null");
+    return false;
 }
 
 Builder.sort = function(fringe,newNodes)
@@ -224,12 +226,16 @@ Builder.walkable = function(world,modifications,x,y,z)
 
 Builder.buildable = function(world,modifications,x,y,z)
 {
-  for (var i=0;i<modifications.length;i++)
+  if (Builder.inWorldBounds(x,y,z,world))
   {
-      if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][2] == z))
-	return false;
+      for (var i=0;i<modifications.length;i++)
+      {
+	  if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][2] == z))
+	    return false;
+      }
+      return (world[x][y][z]==0);
   }
-  return (world[x][y][z]==0);
+  return false;
 }
 
 Builder.moveBy = function(node,world,x,z,actionCode)
@@ -248,6 +254,19 @@ Builder.moveBy = function(node,world,x,z,actionCode)
     {
       var p = {x:node.state.p.x+x,y:node.state.p.y+1,z:node.state.p.z+z};
       return new Builder.Node({p:p,m:node.state.m},node.cost+1,actionCode);
+    }
+    return null;
+}
+
+Builder.buildDirection = function(node,world,x,y,z,actionCode)
+{
+    if (Builder.buildable(world,node.state.m,node.state.p.x+x,node.state.p.y+y,node.state.p.z+z))
+    {
+	var n = [];
+	for (var i=0;i<node.state.m.length;i++)
+	    n.push(node.state.m[i]);
+	n.push([node.state.p.x+x,node.state.p.y+y,node.state.p.z+z]);
+	return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,actionCode);
     }
     return null;
 }
@@ -274,114 +293,42 @@ Builder.moveLeft = function(node,world)
 
 Builder.buildUp = function(node,world)
 {
-    if (node.state.p.z > 0)
-	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y,node.state.p.z-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,4);
-	}
-    return null;
+    return Builder.buildDirection(node,world,0,0,-1,4);
 }
 
 Builder.buildRight = function(node,world)
 {
-    if (node.state.p.x < world.length-1)
-	if (Builder.buildable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x+1,node.state.p.y,node.state.p.z]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,5);
-	}
-    return null;
+    return Builder.buildDirection(node,world,1,0,0,5);
 }
 
 Builder.buildDown = function(node,world)
 {
-    if (node.state.p.z < world[0][0].length-1)
-	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y,node.state.p.z+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,6);
-	}
-    return null;
+    return Builder.buildDirection(node,world,0,0,1,6);
 }
 
 Builder.buildLeft = function(node,world)
 {
-    if (node.state.p.x > 0)
-	if (Builder.buildable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x-1,node.state.p.y,node.state.p.z]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,7);
-	}
-    return null;
+    return Builder.buildDirection(node,world,-1,0,0,7);
 }
 
 Builder.buildStepUp = function(node,world)
 {
-    if ((node.state.p.z > 0) && (node.state.p.y < world[0].length-1))
-	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z-1))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y+1,node.state.p.z-1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,8);
-	}
-    return null;
+    return Builder.buildDirection(node,world,0,1,-1,8);
 }
 
 Builder.buildStepRight = function(node,world)
 {
-    if ((node.state.p.x < world.length-1) && (node.state.p.y < world[0].length-1))
-	if (Builder.buildable(world,node.state.m,node.state.p.x+1,node.state.p.y+1,node.state.p.z))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x+1,node.state.p.y+1,node.state.p.z]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,9);
-	}
-    return null;
+    return Builder.buildDirection(node,world,1,1,0,9);
 }
 
 Builder.buildStepDown = function(node,world)
 {
-    if ((node.state.p.z < world[0][0].length-1) && (node.state.p.y < world[0].length-1))
-	if (Builder.buildable(world,node.state.m,node.state.p.x,node.state.p.y+1,node.state.p.z+1))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x,node.state.p.y+1,node.state.p.z+1]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,10);
-	}
-    return null;
+    return Builder.buildDirection(node,world,0,1,1,10);
 }
 
 Builder.buildStepLeft = function(node,world)
 {
-    if ((node.state.p.x > 0) && (node.state.p.y < world[0].length-1))
-	if (Builder.buildable(world,node.state.m,node.state.p.x-1,node.state.p.y+1,node.state.p.z))
-	{
-	  var n = [];
-	  for (var i=0;i<node.state.m.length;i++)
-	      n.push(node.state.m[i]);
-	  n.push([node.state.p.x-1,node.state.p.y+1,node.state.p.z]);
-	  return new Builder.Node({p:node.state.p,m:n},node.cost+Builder.buildCost,11);
-	}
-    return null;
+    return Builder.buildDirection(node,world,-1,1,0,11);
 }
 
 Builder.buildCost = 3;

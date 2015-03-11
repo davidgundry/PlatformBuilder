@@ -125,15 +125,15 @@ Manager.createWorld = function(width,height,depth)
   var world = [];
   for (var i=0;i<width;i++)
   {
-    world.push([]);
-    for (var j=0;j<height;j++)
-    {
-	world[i].push([]);
-	for (var k=0;k<depth;k++)
-	{
-	    world[i][j][k] = 0;//Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
-	}
-    }
+      world.push([]);
+      for (var j=0;j<height;j++)
+      {
+	  world[i].push([]);
+	  for (var k=0;k<depth;k++)
+	  {
+	      world[i][j][k] = 0;//Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
+	  }
+      }
   }
   
   return world;
