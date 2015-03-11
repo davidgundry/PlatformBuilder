@@ -202,10 +202,10 @@ Builder.walkable = function(world,modifications,x,y,z)
 
 Builder.moveUp = function(node,world)
 {
-    if (node.state.p.y > 0)
-	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y-1))
+    if (node.state.p.z > 0)
+	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z-1))
 	{
-	  var p = {x:node.state.p.x,y:node.state.p.y-1};
+	  var p = {x:node.state.p.x,y:node.state.p.y,z:node.state.p.z-1};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,0);
 	}
     return null;
@@ -214,9 +214,9 @@ Builder.moveUp = function(node,world)
 Builder.moveRight = function(node,world)
 {
     if (node.state.p.x < world.length-1)
-	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y))
+	if (Builder.walkable(world,node.state.m,node.state.p.x+1,node.state.p.y,node.state.p.z))
 	{
-	  var p = {x:node.state.p.x+1,y:node.state.p.y};
+	  var p = {x:node.state.p.x+1,y:node.state.p.y,z:node.state.p.z};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,1);
 	}
     return null;
@@ -224,10 +224,10 @@ Builder.moveRight = function(node,world)
 
 Builder.moveDown = function(node,world)
 {
-    if (node.state.p.y < world[0].length-1)
-	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y+1))
+    if (node.state.p.z < world[0][0].length-1)
+	if (Builder.walkable(world,node.state.m,node.state.p.x,node.state.p.y,node.state.p.z+1))
 	{
-	  var p = {x:node.state.p.x,y:(node.state.p.y+1)};
+	  var p = {x:node.state.p.x,y:node.state.p.y,z:(node.state.p.z+1)};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,2);
 	}
     return null;
@@ -236,9 +236,9 @@ Builder.moveDown = function(node,world)
 Builder.moveLeft = function(node,world)
 {
     if (node.state.p.x > 0)
-	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y))
+	if (Builder.walkable(world,node.state.m,node.state.p.x-1,node.state.p.y,node.state.p.z))
 	{
-	  var p = {x:node.state.p.x-1,y:node.state.p.y};
+	  var p = {x:node.state.p.x-1,y:node.state.p.y,z:node.state.p.z};
 	  return new Builder.Node({p:p,m:node.state.m},node.cost+1,3);
 	}
     return null;
