@@ -4,7 +4,7 @@ var m = null;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.updateCountdown,e.data.activityTime);
+    Manager.run(e.data.numAgents,e.data.width,e.data.height,,e.data.depth,e.data.updateCountdown,e.data.activityTime);
   }
   else if ( e.data.msg === "pause" ) {
     m.pause();
@@ -15,7 +15,7 @@ function Agent(id,origin,goal)
 {
     this.id = id;   
     this.origin = origin;
-    this.position = {x:this.origin.x,y:this.origin.y};
+    this.position = {x:this.origin.x,y:this.origin.y,z:this.origin.z};
     this.goal = goal;
 }
 
@@ -54,27 +54,27 @@ Agent.createPlanner = function(m)
       return planner;
 }
 
-function Manager(numAgents,width,height)
+function Manager(numAgents,width,height,depth)
 {
     this.agents = Array(numAgents);
-    this.world = Manager.createWorld(width,height)
+    this.world = Manager.createWorld(width,height,depth)
 }
 
 Manager.prototype.paused = false;
 
-Manager.run = function(numAgents,width,height,updateCountdown,activityTime)
+Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime)
 {
-    m = new Manager(numAgents,width,height);
+    m = new Manager(numAgents,width,height,depth);
     m.updateCountdown = updateCountdown;
     var builder;
     var origin;
     var goal;
     for (var i=0;i<m.agents.length;i++)
     {
-	origin = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
-	m.world[origin.x][origin.y]=3;
-	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1))};
-	m.world[goal.x][goal.y] = 4;
+	origin = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1)),z:Math.round(Math.random()*(m.world[0][0].length-1))};
+	m.world[origin.x][origin.y][origin.z]=3;
+	goal = {x:Math.round(Math.random()*(m.world.length-1)),y:Math.round(Math.random()*(m.world[0].length-1)),z:Math.round(Math.random()*(m.world[0][0].length-1))};
+	m.world[goal.x][goal.y][goal.y] = 4;
 	m.agents[i] = new Agent(i,origin,goal);
 	m.agents[i].planner = Agent.createPlanner(m);
 	m.agents[i].plan(m.world,updateCountdown);
@@ -116,7 +116,7 @@ Manager.prototype.rePlanAgents = function()
     }
 }
 
-Manager.createWorld = function(width,height)
+Manager.createWorld = function(width,height,depth)
 {
   var world = [];
   for (var i=0;i<width;i++)
@@ -124,7 +124,11 @@ Manager.createWorld = function(width,height)
     world.push([]);
     for (var j=0;j<height;j++)
     {
-      world[i][j] = 0;//Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
+	world[i].push([]);
+	for (var k=0;k<depth;k++)
+	{
+	    world[i][j][k] = 0;//Math.min(1,Math.round(Math.random()*4*(j/height)*(j/height)));
+	}
     }
   }
   
@@ -159,14 +163,14 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
 	this.runAgents();
 }
 
-Manager.worldState = function(world,modifications,x,y)
+Manager.worldState = function(world,modifications,x,y,z)
 {
   for (var i=0;i<modifications.length;i++)
   {
-      if ((modifications[i][0] == x) && (modifications[i][1] == y))
+      if ((modifications[i][0] == x) && (modifications[i][1] == y) && (modifications[i][z] == z))
 	return true;
   }
-  return world[x][y];
+  return world[x][y][z];
 }
 
 Manager.agentsAllComplete = function(agents)

@@ -1,4 +1,4 @@
-function Core(width=20,height=20,agents=10,updateCountdown=100,activityTime=100000)
+function Core(width=20,height=20,depth=20,agents=10,updateCountdown=100,activityTime=100000)
 {
     this.debug = true;
 
@@ -70,7 +70,7 @@ Core.prototype.run = function(canvas)
 	}
     };
     
-    this.manager.postMessage({msg:"start",numAgents:this.numAgents,width:this.width,height:this.height,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
+    this.manager.postMessage({msg:"start",numAgents:this.numAgents,width:this.width,height:this.height,depth:this.depth,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
     
     if (debug)
       console.log("Started Manager");
