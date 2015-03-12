@@ -1,6 +1,7 @@
 function PlatformBuilder(){};
 
-PlatformBuilder.debug = 1;
+PlatformBuilder.debug = 0;
+
 var builder = null
 
 onmessage = function(e){
@@ -35,9 +36,12 @@ PlatformBuilder.Builder = function(world,origin,goal)
   this.closedList = [];
   this.currentNode = this.fringe[0];
 }
+
+PlatformBuilder.Builder.costWeight = 0.3;
+PlatformBuilder.Builder.heuristicWeight = 0.7;
+PlatformBuilder.Builder.buildCost = 3;
+
 PlatformBuilder.Builder.prototype.stepNo = 0;
-PlatformBuilder.Builder.costWeight = 0.2;
-PlatformBuilder.Builder.heuristicWeight = 0.8;
 
 PlatformBuilder.Builder.inWorldBounds = function(x,y,z,world)
 {
@@ -358,9 +362,6 @@ PlatformBuilder.Builder.buildStepLeft = function(node,world)
 {
     return PlatformBuilder.Builder.buildDirection(node,world,-1,1,0,11);
 }
-
-PlatformBuilder.Builder.buildCost = 3;
-
 
 /**
  * moveUp = 0
