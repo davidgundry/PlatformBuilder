@@ -2,7 +2,7 @@ function PlatformBuilder(){}
 
 PlatformBuilder.debug = 0;
 
-PlatformBuilder.Core = function(width=10,height=10,depth=10,agents=8,updateCountdown=100,activityTime=1000)
+PlatformBuilder.Core = function(width=10,height=10,depth=10,agents=3,updateCountdown=100,activityTime=1000)
 {
     this.debug = true;
 
