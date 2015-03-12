@@ -1,4 +1,4 @@
-var debug = 2;
+var debug = 1;
 
 var m = null;
 
@@ -80,7 +80,7 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 	m.keepClear(origin.x,origin.y+2,origin.z);
 	
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:9,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:29,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new Agent(i,origin,goal);

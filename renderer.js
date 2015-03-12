@@ -12,7 +12,7 @@ Path.prototype.complete = false;
 
 function Renderer(canvas,width,height,depth,blockWidth=1, blockHeight=1)
 {
-    this.mapWidth = blockWidth*width + 100;
+    this.mapWidth = blockWidth*width + 10;
     this.blockWidth = blockWidth;
     this.blockHeight = blockHeight;
     this.canvas = canvas;
@@ -154,7 +154,7 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff3333 } ) );
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff1111 } ) );
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff6622 } ) );
-    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff2266 } ) );
+    cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff3355 } ) );
     var cubeMaterials = new THREE.MeshFaceMaterial(cubeMaterialArray);
     
     var headroomMaterialArray = [];

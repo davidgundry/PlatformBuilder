@@ -4,7 +4,7 @@ var builder = null
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-        if (debug>0)
+        if (debug>2)
 	console.log("Builder id " + e.data.id + " recieved start message");
     builder = new Builder(e.data.world,e.data.origin,e.data.goal);
     Builder.run(e.data.id,e.data.updateCountdown);
@@ -45,7 +45,7 @@ Builder.inWorldBounds = function(x,y,z,world)
 
 Builder.run = function(id,updateCountdown)
 {
-    if (debug>0)
+    if (debug>2)
 	console.log("Builder started on id " + id);
     var countdown = updateCountdown;
     while (countdown >= 0)
