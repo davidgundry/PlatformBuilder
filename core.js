@@ -1,5 +1,8 @@
 function PlatformBuilder(){}
-PlatformBuilder.Core = function(width=10,height=50,depth=10,agents=5,updateCountdown=100,activityTime=1000)
+
+PlatformBuilder.debug = 1;
+
+PlatformBuilder.Core = function(width=7,height=30,depth=7,agents=5,updateCountdown=100,activityTime=1000)
 {
     this.debug = true;
 
@@ -22,7 +25,7 @@ PlatformBuilder.Core = function(width=10,height=50,depth=10,agents=5,updateCount
 
 PlatformBuilder.Core.prototype.pause = function()
 {
-    if (this.debug)
+    if (PlatformBuilder.debug>0)
 	console.log("paused/unpaused");
     this.paused = !this.paused;
     this.manager.postMessage({msg:"pause"});
@@ -59,10 +62,9 @@ PlatformBuilder.Core.prototype.run = function(canvas)
     this.manager.onmessage = function(e){
 	if ((e.data.msg==="world") || (e.data.msg==="done"))
 	{
-	    if (debug)
+	    if (PlatformBuilder.debug>1)
 	    {
 		console.log("Recieved data to render");
-		console.log(e.data)
 	    }
 
 	    world = e.data.world;
@@ -75,7 +77,7 @@ PlatformBuilder.Core.prototype.run = function(canvas)
 	}
 	else if (e.data.msg==="agentpath")
 	{		
-	    if (debug)
+	    if (PlatformBuilder.debug>1)
 		console.log("Recieved path to render");
 	    agentPaths[e.data.agent].points = e.data.points;
 	    agentPaths[e.data.agent].complete = e.data.complete;
@@ -88,7 +90,7 @@ PlatformBuilder.Core.prototype.run = function(canvas)
     
     this.manager.postMessage({msg:"start",numAgents:this.numAgents,width:this.width,height:this.height,depth:this.depth,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
     
-    if (debug)
+    if (PlatformBuilder.debug>1)
       console.log("Started Manager");
   
 }

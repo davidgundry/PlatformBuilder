@@ -1,6 +1,6 @@
 function PlatformBuilder(){}
 
-var debug = 1;
+PlatformBuilder.debug = 1;
 var m = null;
 
 onmessage = function(e){
@@ -28,7 +28,7 @@ PlatformBuilder.Agent.prototype.candidate = null;
 
 PlatformBuilder.Agent.prototype.plan = function(world,updateCountdown)
 {
-    if (debug>1)
+    if (PlatformBuilder.debug>1)
 	console.log("Agent " + this.id + " starting planner");
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
@@ -81,7 +81,7 @@ PlatformBuilder.Manager.run = function(numAgents,width,height,depth,updateCountd
 	m.keepClear(origin.x,origin.y+2,origin.z);
 	
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:29,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:9,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new PlatformBuilder.Agent(i,origin,goal);
@@ -96,7 +96,7 @@ PlatformBuilder.Manager.run = function(numAgents,width,height,depth,updateCountd
 
 PlatformBuilder.Manager.prototype.pause = function()
 {
-    if (debug>0)
+    if (PlatformBuilder.debug>0)
 	console.log("Manager paused/unpaused");
     this.paused = !this.paused;
 }
@@ -109,7 +109,7 @@ PlatformBuilder.Manager.prototype.rePlanAgents = function()
 	{
 	    this.agents[i].complete = false;
 	    this.agents[i].plan(this.world,this.updateCountdown);
-	    if (debug>1)
+	    if (PlatformBuilder.debug>1)
 		console.log("Started replanning agent "+i);
 	}
 	else if (!this.agents[i].complete)
@@ -119,7 +119,7 @@ PlatformBuilder.Manager.prototype.rePlanAgents = function()
 	    //this.agents[i].planner = PlatformBuilder.Agent.createPlanner(this);
 	    this.agents[i].candidate = null;
 	    this.agents[i].plan(this.world,this.updateCountdown);
-	    if (debug>1)
+	    if (PlatformBuilder.debug>1)
 		console.log("Continued planning agent "+i);
 	}
     }
@@ -151,7 +151,7 @@ PlatformBuilder.Manager.prototype.gotCandidate = function(workerIndex,candidate,
     this.agents[workerIndex].modifications = modifications;
     this.agents[workerIndex].complete = complete;
 	    
-    if (debug>1)
+    if (PlatformBuilder.debug>1)
     {
 	if (complete)
 	    console.log("Agent "+workerIndex+" has a candidate solution");
@@ -230,7 +230,7 @@ PlatformBuilder.Manager.prototype.runAgents = function()
 
 PlatformBuilder.Manager.prototype.complete = function()
 {
-    if (debug>0)
+    if (PlatformBuilder.debug>0)
 	console.log("Returning final output");
     for (var i=0;i<this.agents.length;i++)
 	this.agents[i].stop();
@@ -270,7 +270,7 @@ PlatformBuilder.Manager.buildable = function(world,x,y,z)
     
     if ((z >= 0) && (z < world[0][0].length))
       	return world[x][y][z] == 0;
-    else if (debug>0)
+    else if (PlatformBuilder.debug>0)
 	console.log("ERROR: tried to access world["+x+"]["+y+"][" +z+"]");
     return false;
 }
