@@ -4,6 +4,8 @@ var builder = null
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
+        if (debug>0)
+	console.log("Builder id " + e.data.id + " recieved start message");
     builder = new Builder(e.data.world,e.data.origin,e.data.goal);
     Builder.run(e.data.id,e.data.updateCountdown);
   } 
@@ -43,6 +45,8 @@ Builder.inWorldBounds = function(x,y,z,world)
 
 Builder.run = function(id,updateCountdown)
 {
+    if (debug>0)
+	console.log("Builder started on id " + id);
     var countdown = updateCountdown;
     while (countdown >= 0)
     {
@@ -69,7 +73,6 @@ Builder.run = function(id,updateCountdown)
 	}
 	var c = Builder.createCandidate(builder.currentNode)
 	postMessage({id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m,empties:c.e});
-	close();
     }
     else
 	console.log("Builder failed to return candidate");

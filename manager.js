@@ -1,4 +1,4 @@
-var debug = 1;
+var debug = 2;
 
 var m = null;
 
@@ -27,6 +27,8 @@ Agent.prototype.candidate = null;
 
 Agent.prototype.plan = function(world,updateCountdown)
 {
+    if (debug>1)
+	console.log("Agent " + this.id + " starting planner");
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
 

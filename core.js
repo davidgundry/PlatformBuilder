@@ -66,8 +66,11 @@ Core.prototype.run = function(canvas)
 
 	    world = e.data.world;
 	    renderer.renderWorld(world);
-	    renderer3D.init(world);
-	    animate();
+	    if (e.data.msg==="done")
+	    {
+		renderer3D.init(world);
+		animate();
+	    }
 	}
 	else if (e.data.msg==="agentpath")
 	{		
