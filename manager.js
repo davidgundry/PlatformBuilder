@@ -1,17 +1,18 @@
-var debug = 1;
+function PlatformBuilder(){}
 
+var debug = 1;
 var m = null;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
+    PlatformBuilder.Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
   }
   else if ( e.data.msg === "pause" ) {
     m.pause();
   }
 };
 
-function Agent(id,origin,goal)
+PlatformBuilder.Agent = function(id,origin,goal)
 {
     this.id = id;   
     this.origin = origin;
@@ -19,25 +20,25 @@ function Agent(id,origin,goal)
     this.goal = goal;
 }
 
-Agent.prototype.points = [];
-Agent.prototype.modifications = [];
-Agent.prototype.complete = false;
-Agent.prototype.planner = null;
-Agent.prototype.candidate = null;
+PlatformBuilder.Agent.prototype.points = [];
+PlatformBuilder.Agent.prototype.modifications = [];
+PlatformBuilder.Agent.prototype.complete = false;
+PlatformBuilder.Agent.prototype.planner = null;
+PlatformBuilder.Agent.prototype.candidate = null;
 
-Agent.prototype.plan = function(world,updateCountdown)
+PlatformBuilder.Agent.prototype.plan = function(world,updateCountdown)
 {
     if (debug>1)
 	console.log("Agent " + this.id + " starting planner");
     this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
 }
 
-Agent.prototype.stop = function()
+PlatformBuilder.Agent.prototype.stop = function()
 {
     this.planner.postMessage({msg:"stop"});
 }
 
-Agent.createPlanner = function(m)
+PlatformBuilder.Agent.createPlanner = function(m)
 {
       var planner = new Worker("builder.js");
       planner.onmessage = function(e){
@@ -56,17 +57,17 @@ Agent.createPlanner = function(m)
       return planner;
 }
 
-function Manager(numAgents,width,height,depth)
+PlatformBuilder.Manager = function(numAgents,width,height,depth)
 {
     this.agents = Array(numAgents);
-    this.world = Manager.createWorld(width,height,depth)
+    this.world = PlatformBuilder.Manager.createWorld(width,height,depth)
 }
 
-Manager.prototype.paused = false;
+PlatformBuilder.Manager.prototype.paused = false;
 
-Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime)
+PlatformBuilder.Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime)
 {
-    m = new Manager(numAgents,width,height,depth);
+    m = new PlatformBuilder.Manager(numAgents,width,height,depth);
     m.updateCountdown = updateCountdown;
     var origin;
     var goal;
@@ -83,8 +84,8 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 	  y:29,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
-	m.agents[i] = new Agent(i,origin,goal);
-	m.agents[i].planner = Agent.createPlanner(m);
+	m.agents[i] = new PlatformBuilder.Agent(i,origin,goal);
+	m.agents[i].planner = PlatformBuilder.Agent.createPlanner(m);
 	m.agents[i].plan(m.world,updateCountdown);
     }
     postMessage({msg:"world",world:m.world});
@@ -93,14 +94,14 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
     },activityTime);
 }
 
-Manager.prototype.pause = function()
+PlatformBuilder.Manager.prototype.pause = function()
 {
     if (debug>0)
 	console.log("Manager paused/unpaused");
     this.paused = !this.paused;
 }
 
-Manager.prototype.rePlanAgents = function()
+PlatformBuilder.Manager.prototype.rePlanAgents = function()
 {
     for (var i=0;i<this.agents.length;i++)
     {
@@ -115,7 +116,7 @@ Manager.prototype.rePlanAgents = function()
 	{
 	    //if (this.agents[i].planner != null)
 		//this.agents[i].planner.terminate();  
-	    //this.agents[i].planner = Agent.createPlanner(this);
+	    //this.agents[i].planner = PlatformBuilder.Agent.createPlanner(this);
 	    this.agents[i].candidate = null;
 	    this.agents[i].plan(this.world,this.updateCountdown);
 	    if (debug>1)
@@ -124,7 +125,7 @@ Manager.prototype.rePlanAgents = function()
     }
 }
 
-Manager.createWorld = function(width,height,depth)
+PlatformBuilder.Manager.createWorld = function(width,height,depth)
 {
   var world = [];
   for (var i=0;i<width;i++)
@@ -143,7 +144,7 @@ Manager.createWorld = function(width,height,depth)
   return world;
 }
 
-Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modifications,complete)
+PlatformBuilder.Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modifications,complete)
 {
     this.agents[workerIndex].candidate = candidate;
     this.agents[workerIndex].points = points;
@@ -158,11 +159,11 @@ Manager.prototype.gotCandidate = function(workerIndex,candidate,points,modificat
 	    console.log("Agent "+workerIndex+" has a current-best solution");
     }
     
-    if (Manager.agentsAllComplete(this.agents))
+    if (PlatformBuilder.Manager.agentsAllComplete(this.agents))
 	this.runAgents();
 }
 
-Manager.worldState = function(world,modifications,x,y,z)
+PlatformBuilder.Manager.worldState = function(world,modifications,x,y,z)
 {
   for (var i=0;i<modifications.length;i++)
   {
@@ -172,7 +173,7 @@ Manager.worldState = function(world,modifications,x,y,z)
   return world[x][y][z];
 }
 
-Manager.agentsAllComplete = function(agents)
+PlatformBuilder.Manager.agentsAllComplete = function(agents)
 {
     var allComplete = true;
     for (var i=0;i<agents.length;i++)
@@ -186,7 +187,7 @@ Manager.agentsAllComplete = function(agents)
     return allComplete;
 }
 
-Manager.prototype.runAgents = function()
+PlatformBuilder.Manager.prototype.runAgents = function()
 {
     if (!this.paused)
     {
@@ -217,7 +218,7 @@ Manager.prototype.runAgents = function()
 	    this.agents[firstToFail].candidate = null;
 	    this.rePlanAgents();
 	}
-	else if (!Manager.agentsAllComplete(this.agents))
+	else if (!PlatformBuilder.Manager.agentsAllComplete(this.agents))
 	{
 	    postMessage({msg:"world",world:this.world});
 	    this.rePlanAgents();
@@ -227,7 +228,7 @@ Manager.prototype.runAgents = function()
     }
 }
 
-Manager.prototype.complete = function()
+PlatformBuilder.Manager.prototype.complete = function()
 {
     if (debug>0)
 	console.log("Returning final output");
@@ -237,14 +238,14 @@ Manager.prototype.complete = function()
     close();
 }
 
-Manager.inWorldBounds = function(x,y,z,world)
+PlatformBuilder.Manager.inWorldBounds = function(x,y,z,world)
 {
     return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0) && (z < world[0][0].length) && (z >= 0));
 }
 
-Manager.walkable = function(world,x,y,z)
+PlatformBuilder.Manager.walkable = function(world,x,y,z)
 {
-    if (!Manager.inWorldBounds(x,y,z,world))
+    if (!PlatformBuilder.Manager.inWorldBounds(x,y,z,world))
       return false;
     
     var floor = false;
@@ -262,9 +263,9 @@ Manager.walkable = function(world,x,y,z)
     return (floor && headroom);
 }
 
-Manager.buildable = function(world,x,y,z)
+PlatformBuilder.Manager.buildable = function(world,x,y,z)
 {
-    if (!Manager.inWorldBounds(x,y,z,world))
+    if (!PlatformBuilder.Manager.inWorldBounds(x,y,z,world))
       return false;
     
     if ((z >= 0) && (z < world[0][0].length))
@@ -274,7 +275,7 @@ Manager.buildable = function(world,x,y,z)
     return false;
 }
 
-Manager.prototype.action = function(actionID,agentID)
+PlatformBuilder.Manager.prototype.action = function(actionID,agentID)
 {
     switch (actionID)
     {
@@ -330,20 +331,20 @@ Manager.prototype.action = function(actionID,agentID)
     return true;
 }
 
-Manager.prototype.moveBy = function(agentID,x,z)
+PlatformBuilder.Manager.prototype.moveBy = function(agentID,x,z)
 {
-    if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y,this.agents[agentID].position.z+z))
+    if (PlatformBuilder.Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y,this.agents[agentID].position.z+z))
     {
       	this.agents[agentID].position.x+=x;
 	this.agents[agentID].position.z+=z;
     }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y-1,this.agents[agentID].position.z+z))
+    else if (PlatformBuilder.Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y-1,this.agents[agentID].position.z+z))
     {
 	this.agents[agentID].position.x+=x;
 	this.agents[agentID].position.z+=z;
 	this.agents[agentID].position.y--;
     }
-    else if (Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+1,this.agents[agentID].position.z+z))
+    else if (PlatformBuilder.Manager.walkable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+1,this.agents[agentID].position.z+z))
     {
       	this.agents[agentID].position.x+=x;
 	this.agents[agentID].position.z+=z;
@@ -356,17 +357,17 @@ Manager.prototype.moveBy = function(agentID,x,z)
     return true;
 }
 
-Manager.prototype.keepClear = function(x,y,z)
+PlatformBuilder.Manager.prototype.keepClear = function(x,y,z)
 {
-    if (Manager.inWorldBounds(x,y,z,this.world))
+    if (PlatformBuilder.Manager.inWorldBounds(x,y,z,this.world))
     {
 	this.world[x][y][z] = -1;
     }
 }
 
-Manager.prototype.buildDirection = function(agentID,x,y,z)
+PlatformBuilder.Manager.prototype.buildDirection = function(agentID,x,y,z)
 {
-    if (Manager.buildable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+y,this.agents[agentID].position.z+z))
+    if (PlatformBuilder.Manager.buildable(this.world,this.agents[agentID].position.x+x,this.agents[agentID].position.y+y,this.agents[agentID].position.z+z))
     {
 	this.world[this.agents[agentID].position.x+x][this.agents[agentID].position.y+y][this.agents[agentID].position.z+z] = 2;
 	return true;
@@ -374,62 +375,62 @@ Manager.prototype.buildDirection = function(agentID,x,y,z)
     return false; 
 }
 
-Manager.prototype.moveUp = function(agentID)
+PlatformBuilder.Manager.prototype.moveUp = function(agentID)
 {
     return this.moveBy(agentID,0,-1);
 }
 
-Manager.prototype.moveRight = function(agentID)
+PlatformBuilder.Manager.prototype.moveRight = function(agentID)
 {
     return this.moveBy(agentID,1,0);
 }
 
-Manager.prototype.moveDown = function(agentID)
+PlatformBuilder.Manager.prototype.moveDown = function(agentID)
 {
     return this.moveBy(agentID,0,1);
 }
 
-Manager.prototype.moveLeft = function(agentID)
+PlatformBuilder.Manager.prototype.moveLeft = function(agentID)
 {
     return this.moveBy(agentID,-1,0);
 }
 
-Manager.prototype.buildUp = function(agentID)
+PlatformBuilder.Manager.prototype.buildUp = function(agentID)
 {
     return this.buildDirection(agentID,0,0,-1);
 }
 
-Manager.prototype.buildRight = function(agentID)
+PlatformBuilder.Manager.prototype.buildRight = function(agentID)
 {
     return this.buildDirection(agentID,1,0,0);
 }
 
-Manager.prototype.buildDown = function(agentID)
+PlatformBuilder.Manager.prototype.buildDown = function(agentID)
 {
     return this.buildDirection(agentID,0,0,1);
 }
 
-Manager.prototype.buildLeft = function(agentID)
+PlatformBuilder.Manager.prototype.buildLeft = function(agentID)
 {
     return this.buildDirection(agentID,-1,0,0);
 }
 
-Manager.prototype.buildStepUp = function(agentID)
+PlatformBuilder.Manager.prototype.buildStepUp = function(agentID)
 {
     return this.buildDirection(agentID,0,1,-1);
 }
 
-Manager.prototype.buildStepRight = function(agentID)
+PlatformBuilder.Manager.prototype.buildStepRight = function(agentID)
 {
     return this.buildDirection(agentID,1,1,0);
 }
 
-Manager.prototype.buildStepDown = function(agentID)
+PlatformBuilder.Manager.prototype.buildStepDown = function(agentID)
 {
     return this.buildDirection(agentID,0,1,1);
 }
 
-Manager.prototype.buildStepLeft = function(agentID)
+PlatformBuilder.Manager.prototype.buildStepLeft = function(agentID)
 {
     return this.buildDirection(agentID,-1,1,0);
 }

@@ -1,4 +1,5 @@
-function Core(width=10,height=50,depth=10,agents=5,updateCountdown=100,activityTime=1000)
+function PlatformBuilder(){}
+PlatformBuilder.Core = function(width=10,height=50,depth=10,agents=5,updateCountdown=100,activityTime=1000)
 {
     this.debug = true;
 
@@ -19,7 +20,7 @@ function Core(width=10,height=50,depth=10,agents=5,updateCountdown=100,activityT
     this.paused = false;
 }
 
-Core.prototype.pause = function()
+PlatformBuilder.Core.prototype.pause = function()
 {
     if (this.debug)
 	console.log("paused/unpaused");
@@ -27,7 +28,7 @@ Core.prototype.pause = function()
     this.manager.postMessage({msg:"pause"});
 }
 
-Core.prototype.run = function(canvas)
+PlatformBuilder.Core.prototype.run = function(canvas)
 {
     //var maxWidth = window.innerWidth/2;
     var maxHeight = window.innerHeight/4;
@@ -36,8 +37,8 @@ Core.prototype.run = function(canvas)
     
     var blockWidth = Math.max(1,Math.floor(maxWidth/this.width));
     var blockHeight = Math.max(1,Math.floor(maxHeight/this.depth));
-    var renderer = new Renderer(canvas,this.width,this.height,this.depth,blockWidth,blockHeight);
-    var renderer3D = new Renderer.Renderer3D();
+    var renderer = new PlatformBuilder.Renderer.Renderer2D(canvas,this.width,this.height,this.depth,blockWidth,blockHeight);
+    var renderer3D = new PlatformBuilder.Renderer.Renderer3D();
     
     var animate = function()
     {
@@ -51,7 +52,7 @@ Core.prototype.run = function(canvas)
     {	  
 	var offsetX = Math.round(Math.random()*blockWidth/3 - blockWidth/3);
 	var offsetY = Math.round(Math.random()*blockHeight/3 - blockHeight/3);
-	agentPaths.push(new Path(offsetX,offsetY));
+	agentPaths.push(new PlatformBuilder.Path(offsetX,offsetY));
     }
     var world = null;
     

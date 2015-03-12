@@ -1,16 +1,17 @@
 var debug = 0;	
+PlatformBuilder.Renderer = function(){}
 
-function Path(offsetX,offsetY)
+PlatformBuilder.Path = function(offsetX,offsetY)
 {
     this.offsetX = offsetX;
     this.offsetY = offsetY;
 }
 
-Path.prototype.modifications = [];
-Path.prototype.points = [];
-Path.prototype.complete = false;
+PlatformBuilder.Path.prototype.modifications = [];
+PlatformBuilder.Path.prototype.points = [];
+PlatformBuilder.Path.prototype.complete = false;
 
-function Renderer(canvas,width,height,depth,blockWidth=1, blockHeight=1)
+PlatformBuilder.Renderer.Renderer2D = function(canvas,width,height,depth,blockWidth=1, blockHeight=1)
 {
     this.mapWidth = blockWidth*width + 10;
     this.blockWidth = blockWidth;
@@ -21,7 +22,7 @@ function Renderer(canvas,width,height,depth,blockWidth=1, blockHeight=1)
     this.context = canvas.getContext("2d");
 }
 
-Renderer.prototype.renderWorld = function(data)
+PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
 {
     this.context.fillStyle = "#333";    
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -62,7 +63,7 @@ Renderer.prototype.renderWorld = function(data)
 	console.log("Rendering finished");
 }
 
-Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
+PlatformBuilder.Renderer.Renderer2D.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 {
       var halfWidth = Math.round(this.blockWidth/2);
       var halfHeight = Math.round(this.blockHeight/2);
@@ -110,7 +111,7 @@ Renderer.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 }
    
    
-Renderer.Renderer3D = function()
+PlatformBuilder.Renderer.Renderer3D = function()
 {
     this.container = null;
     this.scene = null;
@@ -119,7 +120,7 @@ Renderer.Renderer3D = function()
     this.controls = null;
 }
 		
-Renderer.Renderer3D.prototype.init = function(world) 
+PlatformBuilder.Renderer.Renderer3D.prototype.init = function(world) 
 {
     this.scene = new THREE.Scene();
     
@@ -146,7 +147,7 @@ Renderer.Renderer3D.prototype.init = function(world)
     this.createWorld(world);
 }
 
-Renderer.Renderer3D.prototype.createWorld = function(world)
+PlatformBuilder.Renderer.Renderer3D.prototype.createWorld = function(world)
 {
     var cubeMaterialArray = [];
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff5500 } ) );
@@ -212,12 +213,12 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
 	    }
 }
 
-Renderer.Renderer3D.prototype.update = function()
+PlatformBuilder.Renderer.Renderer3D.prototype.update = function()
 {
     this.controls.update();
 }
 
-Renderer.Renderer3D.prototype.render = function() 
+PlatformBuilder.Renderer.Renderer3D.prototype.render = function() 
 {	
     this.renderer.render(this.scene, this.camera);
 }

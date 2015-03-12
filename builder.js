@@ -1,23 +1,24 @@
-var debug = 1;
+function PlatformBuilder(){};
 
+var debug = 1;
 var builder = null
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
         if (debug>2)
 	console.log("Builder id " + e.data.id + " recieved start message");
-    builder = new Builder(e.data.world,e.data.origin,e.data.goal);
-    Builder.run(e.data.id,e.data.updateCountdown);
+    builder = new PlatformBuilder.Builder(e.data.world,e.data.origin,e.data.goal);
+    PlatformBuilder.Builder.run(e.data.id,e.data.updateCountdown);
   } 
   else if ( e.data.msg === "continue" ) {
-    Builder.run(e.data.id,e.data.updateCountdown);
+    PlatformBuilder.Builder.run(e.data.id,e.data.updateCountdown);
   }
   else if ( e.data.msg === "stop" ) {
     close();
   }
 };
 
-function Builder(world,origin,goal)
+PlatformBuilder.Builder = function(world,origin,goal)
 {
   if (debug > 0)
       this.time = performance.now();
@@ -25,25 +26,25 @@ function Builder(world,origin,goal)
   this.goal = goal;
 
 
-  if (!Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (debug>0))
+  if (!PlatformBuilder.Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (debug>0))
     console.log("ERROR: Origin " + origin.x +", "+origin.y +", "+origin.z + " not in world bounds.");
-  if (!Builder.inWorldBounds(goal.x,goal.y,goal.z,world) && (debug>0))
+  if (!PlatformBuilder.Builder.inWorldBounds(goal.x,goal.y,goal.z,world) && (debug>0))
     console.log("ERROR: Goal " + goal.x +", "+goal.y +", "+goal.z + " not in world bounds.");
   
-  this.fringe = [new Builder.Node({p:origin,m:[],e:[]},0,null)];
+  this.fringe = [new PlatformBuilder.Builder.Node({p:origin,m:[],e:[]},0,null)];
   this.closedList = [];
   this.currentNode = this.fringe[0];
 }
-Builder.prototype.stepNo = 0;
-Builder.costWeight = 0.2;
-Builder.heuristicWeight = 0.8;
+PlatformBuilder.Builder.prototype.stepNo = 0;
+PlatformBuilder.Builder.costWeight = 0.2;
+PlatformBuilder.Builder.heuristicWeight = 0.8;
 
-Builder.inWorldBounds = function(x,y,z,world)
+PlatformBuilder.Builder.inWorldBounds = function(x,y,z,world)
 {
     return ((x < world.length) && (x >= 0) && (y < world[0].length) && (y >= 0) && (z < world[0][0].length) && (z >= 0));
 }
 
-Builder.run = function(id,updateCountdown)
+PlatformBuilder.Builder.run = function(id,updateCountdown)
 {
     if (debug>2)
 	console.log("Builder started on id " + id);
@@ -55,7 +56,7 @@ Builder.run = function(id,updateCountdown)
 	  break;
 	if (countdown == 0)
 	{
-	    var c = Builder.createCandidate(builder.currentNode)
+	    var c = PlatformBuilder.Builder.createCandidate(builder.currentNode)
 	    countdown=updateCountdown;
 	    postMessage({id:id,msg:"current",candidate:c.a,points:c.p,modifications:c.m,empties:c.e});
 	    return;
@@ -64,21 +65,21 @@ Builder.run = function(id,updateCountdown)
 	    countdown--;
     } 
     
-    if (Builder.goalTest(builder.currentNode.state,builder.goal))
+    if (PlatformBuilder.Builder.goalTest(builder.currentNode.state,builder.goal))
     {
 	if (debug>0)
 	{
 	    builder.time = performance.now()-builder.time;
 	    builder.summary(builder.currentNode,builder.stepNo,builder.time);
 	}
-	var c = Builder.createCandidate(builder.currentNode)
+	var c = PlatformBuilder.Builder.createCandidate(builder.currentNode)
 	postMessage({id:id,msg:"candidate",candidate:c.a,points:c.p,modifications:c.m,empties:c.e});
     }
     else
 	console.log("Builder failed to return candidate");
 }
 
-Builder.createCandidate = function(currentNode,closedList)
+PlatformBuilder.Builder.createCandidate = function(currentNode,closedList)
 {
     var actions = [];
     var points = [];
@@ -92,27 +93,27 @@ Builder.createCandidate = function(currentNode,closedList)
     return {a:actions,p:points,m:currentNode.state.m,e:currentNode.state.e};
 }
 
-Builder.prototype.step = function()
+PlatformBuilder.Builder.prototype.step = function()
 {
     if (debug>1)
 	console.log("Fringe length: "+this.fringe.length);
     
     if (this.currentNode != null)
     {
-	if (Builder.goalTest(builder.currentNode.state,builder.goal))
+	if (PlatformBuilder.Builder.goalTest(builder.currentNode.state,builder.goal))
 	    return false;
 	if (debug>1)
 	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + ","+this.currentNode.state.p.z + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length + " e: "+this.currentNode.state.e.length);
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
 	this.closedList.push(this.currentNode);
-	var newNodes = Builder.expand(this.currentNode,Builder.actions,this.goal,this.world);
+	var newNodes = PlatformBuilder.Builder.expand(this.currentNode,PlatformBuilder.Builder.actions,this.goal,this.world);
 	for (var i=newNodes.length-1;i>=0;i--)
 	{
-	  newNodes[i].heuristic = Builder.costWeight*newNodes[i].cost + Builder.heuristicWeight*Builder.heuristic(newNodes[i].state,this.goal);
+	  newNodes[i].heuristic = PlatformBuilder.Builder.costWeight*newNodes[i].cost + PlatformBuilder.Builder.heuristicWeight*PlatformBuilder.Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
 	  for (var j=this.closedList.length-1;j>=0;j--)
 	  {
-	      if (Builder.Node.equals(newNodes[i],this.closedList[j]))
+	      if (PlatformBuilder.Builder.Node.equals(newNodes[i],this.closedList[j]))
 		if ((newNodes[i].heuristic) >= (this.closedList[j].heuristic))
 		{
 		    newNodes.splice(i,1);
@@ -121,7 +122,7 @@ Builder.prototype.step = function()
 	  }
 		
 	}
-	this.fringe = Builder.sort(this.fringe,newNodes);
+	this.fringe = PlatformBuilder.Builder.sort(this.fringe,newNodes);
 	this.currentNode = this.fringe[0];
 	return true;
     }
@@ -129,13 +130,13 @@ Builder.prototype.step = function()
     return false;
 }
 
-Builder.sort = function(fringe,newNodes)
+PlatformBuilder.Builder.sort = function(fringe,newNodes)
 {
     for (var i=newNodes.length-1;i>=0;i--)
     {
 	for (var j=fringe.length-1;j>=0;j--)
 	{
-	    if (Builder.Node.equals(newNodes[i],fringe[j]))
+	    if (PlatformBuilder.Builder.Node.equals(newNodes[i],fringe[j]))
 	    {
 		if ((newNodes[i].heuristic) < (fringe[j].heuristic))
 		    fringe.splice(j,1);
@@ -154,7 +155,7 @@ Builder.sort = function(fringe,newNodes)
     return fringe;
 }
 
-Builder.expand = function(node,actions,goal,world)
+PlatformBuilder.Builder.expand = function(node,actions,goal,world)
 {
     var children = [];
     for (var i=0;i<actions.length;i++)
@@ -170,27 +171,27 @@ Builder.expand = function(node,actions,goal,world)
     return children;
 }
 
-Builder.goalTest = function(state,goal)
+PlatformBuilder.Builder.goalTest = function(state,goal)
 {
   return ((state.p.x==goal.x) && (state.p.y==goal.y) && (state.p.z==goal.z));
 }
 
-Builder.Node = function(state,cost,action)
+PlatformBuilder.Builder.Node = function(state,cost,action)
 {
     this.state = state;
     this.cost = cost;
     this.action = action;
 }
 
-Builder.Node.equals = function(n1,n2)
+PlatformBuilder.Builder.Node.equals = function(n1,n2)
 {
   return ((n1.state.p.x == n2.state.p.x) && (n1.state.p.y == n2.state.p.y) && (n1.state.p.z == n2.state.p.z) && (n1.state.m == n2.state.m));
 }
 
-Builder.Node.prototype.heuristic = 0;
-Builder.Node.prototype.parent = null;
+PlatformBuilder.Builder.Node.prototype.heuristic = 0;
+PlatformBuilder.Builder.Node.prototype.parent = null;
 
-Builder.heuristic = function(state,goal)
+PlatformBuilder.Builder.heuristic = function(state,goal)
 {
     var xdiff = goal.x - state.p.x;
     var ydiff = goal.y - state.p.y;
@@ -199,9 +200,9 @@ Builder.heuristic = function(state,goal)
     return Math.abs(xdiff)+Math.abs(ydiff)+Math.abs(zdiff);
 }
 
-Builder.walkable = function(world,modifications,x,y,z)
+PlatformBuilder.Builder.walkable = function(world,modifications,x,y,z)
 {
-    if (!Builder.inWorldBounds(x,y,z,world))
+    if (!PlatformBuilder.Builder.inWorldBounds(x,y,z,world))
 	return false;
     
     var floor = false;
@@ -231,9 +232,9 @@ Builder.walkable = function(world,modifications,x,y,z)
     return (floor && headroom);
 }
 
-Builder.buildable = function(world,modifications,empties,x,y,z)
+PlatformBuilder.Builder.buildable = function(world,modifications,empties,x,y,z)
 {
-  if (Builder.inWorldBounds(x,y,z,world))
+  if (PlatformBuilder.Builder.inWorldBounds(x,y,z,world))
   {
       for (var i=0;i<modifications.length;i++)
       {
@@ -250,19 +251,19 @@ Builder.buildable = function(world,modifications,empties,x,y,z)
   return false;
 }
 
-Builder.moveBy = function(node,world,x,z,actionCode)
+PlatformBuilder.Builder.moveBy = function(node,world,x,z,actionCode)
 {
     var n = [];
-    if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y,node.state.p.z+z))
+    if (PlatformBuilder.Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y,node.state.p.z+z))
     {
       var p = {x:node.state.p.x+x,y:node.state.p.y,z:node.state.p.z+z};
       for (var i=0;i<node.state.e.length;i++)
 	  n.push(node.state.e[i]);
       n.push([node.state.p.x+x,node.state.p.y+1,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+2,node.state.p.z+z]);
-      return new Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
+      return new PlatformBuilder.Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
     }
-    else if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y-1,node.state.p.z+z))
+    else if (PlatformBuilder.Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y-1,node.state.p.z+z))
     {
       var p = {x:node.state.p.x+x,y:node.state.p.y-1,z:node.state.p.z+z};
       for (var i=0;i<node.state.e.length;i++)
@@ -270,9 +271,9 @@ Builder.moveBy = function(node,world,x,z,actionCode)
       n.push([node.state.p.x+x,node.state.p.y,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+2,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+3,node.state.p.z+z]);
-      return new Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
+      return new PlatformBuilder.Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
     }
-    else if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y+1,node.state.p.z+z))
+    else if (PlatformBuilder.Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y+1,node.state.p.z+z))
     {
       var p = {x:node.state.p.x+x,y:node.state.p.y+1,z:node.state.p.z+z};
       for (var i=0;i<node.state.e.length;i++)
@@ -280,85 +281,85 @@ Builder.moveBy = function(node,world,x,z,actionCode)
       n.push([node.state.p.x+x,node.state.p.y+1,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+2,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+3,node.state.p.z+z]);
-      return new Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
+      return new PlatformBuilder.Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
     }
     return null;
 }
 
-Builder.buildDirection = function(node,world,x,y,z,actionCode)
+PlatformBuilder.Builder.buildDirection = function(node,world,x,y,z,actionCode)
 {
-    if (Builder.buildable(world,node.state.m,node.state.e,node.state.p.x+x,node.state.p.y+y,node.state.p.z+z))
+    if (PlatformBuilder.Builder.buildable(world,node.state.m,node.state.e,node.state.p.x+x,node.state.p.y+y,node.state.p.z+z))
     {
 	var n = [];
 	for (var i=0;i<node.state.m.length;i++)
 	    n.push(node.state.m[i]);
 	n.push([node.state.p.x+x,node.state.p.y+y,node.state.p.z+z]);
-	return new Builder.Node({p:node.state.p,m:n,e:node.state.e},node.cost+Builder.buildCost,actionCode);
+	return new PlatformBuilder.Builder.Node({p:node.state.p,m:n,e:node.state.e},node.cost+PlatformBuilder.Builder.buildCost,actionCode);
     }
     return null;
 }
 
-Builder.moveUp = function(node,world)
+PlatformBuilder.Builder.moveUp = function(node,world)
 {
-    return Builder.moveBy(node,world,0,-1,0);
+    return PlatformBuilder.Builder.moveBy(node,world,0,-1,0);
 }
 
-Builder.moveRight = function(node,world)
+PlatformBuilder.Builder.moveRight = function(node,world)
 {
-    return Builder.moveBy(node,world,1,0,1);
+    return PlatformBuilder.Builder.moveBy(node,world,1,0,1);
 }
 
-Builder.moveDown = function(node,world)
+PlatformBuilder.Builder.moveDown = function(node,world)
 {
-    return Builder.moveBy(node,world,0,1,2);
+    return PlatformBuilder.Builder.moveBy(node,world,0,1,2);
 }
 
-Builder.moveLeft = function(node,world)
+PlatformBuilder.Builder.moveLeft = function(node,world)
 {
-    return Builder.moveBy(node,world,-1,0,3);
+    return PlatformBuilder.Builder.moveBy(node,world,-1,0,3);
 }
 
-Builder.buildUp = function(node,world)
+PlatformBuilder.Builder.buildUp = function(node,world)
 {
-    return Builder.buildDirection(node,world,0,0,-1,4);
+    return PlatformBuilder.Builder.buildDirection(node,world,0,0,-1,4);
 }
 
-Builder.buildRight = function(node,world)
+PlatformBuilder.Builder.buildRight = function(node,world)
 {
-    return Builder.buildDirection(node,world,1,0,0,5);
+    return PlatformBuilder.Builder.buildDirection(node,world,1,0,0,5);
 }
 
-Builder.buildDown = function(node,world)
+PlatformBuilder.Builder.buildDown = function(node,world)
 {
-    return Builder.buildDirection(node,world,0,0,1,6);
+    return PlatformBuilder.Builder.buildDirection(node,world,0,0,1,6);
 }
 
-Builder.buildLeft = function(node,world)
+PlatformBuilder.Builder.buildLeft = function(node,world)
 {
-    return Builder.buildDirection(node,world,-1,0,0,7);
+    return PlatformBuilder.Builder.buildDirection(node,world,-1,0,0,7);
 }
 
-Builder.buildStepUp = function(node,world)
+PlatformBuilder.Builder.buildStepUp = function(node,world)
 {
-    return Builder.buildDirection(node,world,0,1,-1,8);
+    return PlatformBuilder.Builder.buildDirection(node,world,0,1,-1,8);
 }
 
-Builder.buildStepRight = function(node,world)
+PlatformBuilder.Builder.buildStepRight = function(node,world)
 {
-    return Builder.buildDirection(node,world,1,1,0,9);
+    return PlatformBuilder.Builder.buildDirection(node,world,1,1,0,9);
 }
 
-Builder.buildStepDown = function(node,world)
+PlatformBuilder.Builder.buildStepDown = function(node,world)
 {
-    return Builder.buildDirection(node,world,0,1,1,10);
+    return PlatformBuilder.Builder.buildDirection(node,world,0,1,1,10);
 }
 
-Builder.buildStepLeft = function(node,world)
+PlatformBuilder.Builder.buildStepLeft = function(node,world)
 {
-    return Builder.buildDirection(node,world,-1,1,0,11);
+    return PlatformBuilder.Builder.buildDirection(node,world,-1,1,0,11);
 }
 
-Builder.buildCost = 3;
+PlatformBuilder.Builder.buildCost = 3;
 
 
 /**
@@ -375,10 +376,10 @@ Builder.buildCost = 3;
  * buildStepDown = 10
  * buildStepLeft = 11
  */
-Builder.actions = [Builder.moveRight,Builder.moveLeft,Builder.moveUp,Builder.moveDown,Builder.buildRight,Builder.buildLeft,Builder.buildUp,Builder.buildDown,Builder.buildStepRight,Builder.buildStepLeft,Builder.buildStepUp,Builder.buildStepDown];
+PlatformBuilder.Builder.actions = [PlatformBuilder.Builder.moveRight,PlatformBuilder.Builder.moveLeft,PlatformBuilder.Builder.moveUp,PlatformBuilder.Builder.moveDown,PlatformBuilder.Builder.buildRight,PlatformBuilder.Builder.buildLeft,PlatformBuilder.Builder.buildUp,PlatformBuilder.Builder.buildDown,PlatformBuilder.Builder.buildStepRight,PlatformBuilder.Builder.buildStepLeft,PlatformBuilder.Builder.buildStepUp,PlatformBuilder.Builder.buildStepDown];
 
 
-Builder.prototype.summary = function(solution,steps,time)
+PlatformBuilder.Builder.prototype.summary = function(solution,steps,time)
 {
   if (solution != null)
   {

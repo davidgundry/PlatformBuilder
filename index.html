@@ -3,8 +3,8 @@
     <head>
 	<meta charset="utf-8" />
 	<title>Builder</title>
+	<script type="text/javascript" src="core.js"></script>
 	<script type="text/javascript" src="renderer.js"></script>
-	<script type="text/javascript" src ="core.js"></script>
 	<script src="three/three.min.js"></script>
 	<script src="three/OrbitControls.js"></script>
     </head>
@@ -13,7 +13,7 @@
 	<canvas id="outputTarget" onClick="pause()"></canvas>
 	<div id="ThreeJS" style="z-index: 1;"></div>
 	<script type="text/javascript">
-	    var c = new Core();
+	    var c = new PlatformBuilder.Core();
 	    c.run(document.getElementById("outputTarget"));
 	    function pause(){c.pause()};
 	</script>
