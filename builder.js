@@ -200,8 +200,10 @@ PlatformBuilder.Builder.heuristic = function(state,goal)
     var xdiff = goal.x - state.p.x;
     var ydiff = goal.y - state.p.y;
     var zdiff = goal.z - state.p.z;
-    //return Math.sqrt(xdiff*xdiff+ydiff*ydiff);//* (0.5+Math.random()*0.5);
-    return Math.abs(xdiff)+Math.abs(ydiff)+Math.abs(zdiff);
+    var h = Math.sqrt(xdiff*xdiff+ydiff*ydiff);
+    
+    return Math.sqrt(h*h+zdiff*zdiff);//* (0.5+Math.random()*0.5);
+   // return Math.abs(xdiff)+Math.abs(ydiff)+Math.abs(zdiff);
 }
 
 PlatformBuilder.Builder.walkable = function(world,modifications,x,y,z)
