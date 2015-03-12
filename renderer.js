@@ -174,7 +174,7 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
     originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x66ff00 } ) );
     originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x00ff66 } ) );
     var originMaterials = new THREE.MeshFaceMaterial(originMaterialArray);
-    var boxGeometry = new THREE.BoxGeometry( 5, 5, 5, 1, 1, 1 );
+    var boxGeometry = new THREE.BoxGeometry( 5, 2, 5, 1, 1, 1 );
 
     var cube = null;
     
@@ -195,7 +195,7 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
 		      cube = new THREE.Mesh(boxGeometry,goalMaterials);
 		      break;
 	      }
-	      cube.position.set(5*i, 5*j, 5*k);
+	      cube.position.set(5*i, 2*j, 5*k);
 	      this.scene.add(cube);
 	    }
 }
