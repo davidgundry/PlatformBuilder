@@ -156,6 +156,15 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff6622 } ) );
     cubeMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xff2266 } ) );
     var cubeMaterials = new THREE.MeshFaceMaterial(cubeMaterialArray);
+    
+    var headroomMaterialArray = [];
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x666666 } ) );
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x999999 } ) );
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xcccccc } ) );
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x99cc99 } ) );
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x669966 } ) );
+    headroomMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0xcc9966 } ) );
+    var headroomMaterials = new THREE.MeshFaceMaterial(headroomMaterialArray);
 	
     var goalMaterialArray = [];
     goalMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x3300ff } ) );
@@ -186,7 +195,7 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
 	      switch (world[i][j][k])
 	      {
 		  case -1:
-		      cube = new THREE.Mesh(boxGeometry,goalMaterials);
+		      cube = new THREE.Mesh(boxGeometry,headroomMaterials);
 		      break;
 		  case 2:
 		      cube = new THREE.Mesh(boxGeometry,cubeMaterials);
