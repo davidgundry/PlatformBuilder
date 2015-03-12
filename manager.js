@@ -75,6 +75,9 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 	  y:0,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
+	m.keepClear(origin.x,origin.y+1,origin.z);
+	m.keepClear(origin.x,origin.y+2,origin.z);
+	
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
 	  y:4,//Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
