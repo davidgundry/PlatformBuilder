@@ -10,19 +10,24 @@ PlatformBuilder.Path.prototype.modifications = [];
 PlatformBuilder.Path.prototype.points = [];
 PlatformBuilder.Path.prototype.complete = false;
 
-PlatformBuilder.Renderer.Renderer2D = function(canvas,width,height,depth,blockWidth=1, blockHeight=1)
+PlatformBuilder.Renderer.Renderer2D = function(canvas,width,height,depth)
 {
-    this.mapWidth = blockWidth*width + 10;
-    this.blockWidth = blockWidth;
-    this.blockHeight = blockHeight;
+    var maxWidth = 187;
+    
+    this.blockWidth = Math.max(1,Math.floor(maxWidth/width));
+    this.blockHeight = this.blockWidth;
+    
+    this.mapWidth = this.blockHeight*depth + 10;
     this.canvas = canvas;
-    this.canvas.width= this.mapWidth*height;
-    this.canvas.height= depth*blockHeight;
+    this.canvas.width= width*this.blockWidth;
+    this.canvas.height= this.mapWidth*height;
     this.context = canvas.getContext("2d");
 }
 
 PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
 {
+    if (PlatformBuilder.debug>1)
+	console.log("Rendering world");
     this.context.fillStyle = "#333";    
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -30,7 +35,7 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
     for (var j=0;j<data[0].length;j++)
     {
 	this.context.fillStyle = "#fee";    
-	this.context.fillRect(this.mapWidth*j, 0, this.blockWidth*data.length, this.canvas.height);
+	this.context.fillRect(0, this.mapWidth*j, this.blockWidth*data.length, this.blockHeight*data[0].length);
 	
 	for (var i=0;i<data.length;i++)
 	{
@@ -40,30 +45,30 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
 		{
 		    case 1:
 			this.context.fillStyle = "#000";  
-			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			this.context.fillRect(i*this.blockWidth, k*this.blockHeight + j*this.mapWidth, this.blockWidth, this.blockHeight);
 			break;
 		    case 2:
 			this.context.fillStyle = "#f00";  
-			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			this.context.fillRect(i*this.blockWidth, k*this.blockHeight + j*this.mapWidth, this.blockWidth, this.blockHeight);
 			break;
 		    case 3:
 			this.context.fillStyle = "#0f0";  
-			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			this.context.fillRect(i*this.blockWidth, k*this.blockHeight + j*this.mapWidth, this.blockWidth, this.blockHeight);
 			break;
 		    case 4:
 			this.context.fillStyle = "#00f";  
-			this.context.fillRect(i*this.blockWidth + j*this.mapWidth, k*this.blockHeight, this.blockWidth, this.blockHeight);
+			this.context.fillRect(i*this.blockWidth, k*this.blockHeight + j*this.mapWidth, this.blockWidth, this.blockHeight);
 			break;
 		}
 	    }
 	}
     }
-    if (PlatformBuilder.debug>0)
-	console.log("Rendering finished");
 }
 
 PlatformBuilder.Renderer.Renderer2D.prototype.renderPaths = function(paths,blockWidth=1, blockHeight=1)
 {
+      if (PlatformBuilder.debug>1)
+	  console.log("Rendering paths");
       var halfWidth = Math.round(this.blockWidth/2);
       var halfHeight = Math.round(this.blockHeight/2);
       
@@ -79,10 +84,10 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderPaths = function(paths,block
 	  for (var i=paths[p].points.length-2;i>=0;i--)
 	  {
 	      this.context.beginPath();
-	      this.context.moveTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i+1].x)+halfWidth + paths[p].points[i+1].y*this.mapWidth,
-				  paths[p].offsetY+this.blockHeight*(paths[p].points[i+1].z)+halfHeight);
-	      this.context.lineTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i].x)+halfWidth + paths[p].points[i].y*this.mapWidth,
-				  paths[p].offsetY+this.blockHeight*(paths[p].points[i].z)+halfHeight);
+	      this.context.moveTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i+1].x)+halfWidth,
+				  paths[p].offsetY+this.blockHeight*(paths[p].points[i+1].z)+halfHeight + paths[p].points[i+1].y*this.mapWidth);
+	      this.context.lineTo(paths[p].offsetX+this.blockWidth*(paths[p].points[i].x)+halfWidth,
+				  paths[p].offsetY+this.blockHeight*(paths[p].points[i].z)+halfHeight + paths[p].points[i].y*this.mapWidth);
 	      this.context.stroke();
 	  }
 	  
@@ -90,8 +95,8 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderPaths = function(paths,block
 	  if (paths[p].points.length > 0)
 	  {
 	      this.context.fillStyle="#fff";
-	      this.context.fillRect(paths[p].points[paths[p].points.length-1].x*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2) + paths[p].points[paths[p].points.length-1].y*this.mapWidth, 
-			paths[p].points[paths[p].points.length-1].z*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2),
+	      this.context.fillRect(paths[p].points[paths[p].points.length-1].x*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2),
+			paths[p].points[paths[p].points.length-1].z*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2)  + paths[p].points[paths[p].points.length-1].y*this.mapWidth,
 			modDotWidth,
 			modDotHeight);
 	  }
@@ -102,44 +107,45 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderPaths = function(paths,block
 		  this.context.fillStyle="#f0f";
 	      else
 		  this.context.fillStyle="#00f";
-	      this.context.fillRect(paths[p].modifications[i][0]*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2) + paths[p].modifications[i][1]*this.mapWidth, 
-				    paths[p].modifications[i][2]*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2), modDotWidth,
+	      this.context.fillRect(paths[p].modifications[i][0]*this.blockWidth+paths[p].offsetX+halfWidth-Math.round(modDotWidth/2), 
+				    paths[p].modifications[i][2]*this.blockHeight+paths[p].offsetY+halfHeight-Math.round(modDotHeight/2) + paths[p].modifications[i][1]*this.mapWidth, modDotWidth,
 				    modDotHeight);
 	  }
       }
 }
    
    
-PlatformBuilder.Renderer.Renderer3D = function()
+PlatformBuilder.Renderer.Renderer3D = function(container)
 {
-    this.container = null;
+    this.container = container;
     this.scene = null;
     this.camera = null;
     this.renderer = null;
     this.controls = null;
+    
+    var width = 1000;
+    var height = window.innerHeight-30;
+    this.aspectRatio = width / height;
+    this.renderer = new THREE.WebGLRenderer({antialias:true});
+    this.renderer.setSize(width, height);
+    this.container.appendChild(this.renderer.domElement);
 }
 		
 PlatformBuilder.Renderer.Renderer3D.prototype.init = function(world) 
 {
+    if (PlatformBuilder.debug>0)
+	console.log("3D Renderer Initialised");
     this.scene = new THREE.Scene();
     
-    var width = window.innerWidth;
-    var height = window.innerHeight*(3/4);
     var angle = 45;
-    var aspectRatio = width / height;
     var near = 0.1;
     var far = 20000;
     
-    this.camera = new THREE.PerspectiveCamera(angle, aspectRatio, near, far);
+    this.camera = new THREE.PerspectiveCamera(angle, this.aspectRatio, near, far);
     this.scene.add(this.camera);
-    this.camera.position.set(0,200,-150);
+    this.camera.position.set(0,200,0);
     this.camera.lookAt(this.scene.position);	
-
-    this.renderer = new THREE.WebGLRenderer({antialias:true});
-    this.renderer.setSize(width, height);
-    this.container = document.getElementById('ThreeJS');
-    this.container.appendChild(this.renderer.domElement);
-
+    
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
     this.scene.add(new THREE.AmbientLight(0xffffff));

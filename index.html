@@ -10,11 +10,28 @@
     </head>
 
     <body style="margin:0; background-color:#333;">
-	<canvas id="outputTarget" onClick="pause()"></canvas>
-	<div id="ThreeJS" style="z-index: 1;"></div>
+	<div style="position: absolute; top:0;left:0;padding-left:200px; width:1000px; height:20px;">
+	    <input type="submit" value="Pause/Unpause" onClick="pause()" />
+	</div>
+	<div style="position: absolute; top:0;left:0; overflow:auto; width:200px; height:100%;"><canvas id="2DTarget" ></canvas></div>
+	<div id="3DTarget" style="position: absolute; top:20px;left:200px; z-index: 1;"></div>
 	<script type="text/javascript">
-	    var c = new PlatformBuilder.Core();
-	    c.run(document.getElementById("outputTarget"));
+	    var width=10,height=10,depth=10,updateCountdown=100,activityTime=1000;
+	    var c = new PlatformBuilder.Core(width,height,depth,updateCountdown,activityTime,document.getElementById("2DTarget"),document.getElementById('3DTarget'));
+	    
+	    var agents = [];
+	    var goal, origin;
+	    for (var i=0;i<2;i++)
+	    {
+	    	goal = {x:Math.round(Math.random()*(width-1)),
+		    y:Math.round(Math.random()*(height-1)),
+		  z:Math.round(Math.random()*(depth-1))};
+		origin = {x:Math.round(Math.random()*(width-1)),
+		    y:Math.round(Math.random()*(height-1)),
+		    z:Math.round(Math.random()*(depth-1))};
+		agents.push(new PlatformBuilder.CoreAgent(origin,goal))
+	      }
+	    c.run(agents);
 	    function pause(){c.pause()};
 	</script>
     </body>

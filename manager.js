@@ -1,11 +1,11 @@
 function PlatformBuilder(){}
 
-PlatformBuilder.debug = 0;
+PlatformBuilder.debug = 2;
 var m = null;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    PlatformBuilder.Manager.run(e.data.numAgents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
+    PlatformBuilder.Manager.run(e.data.agents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
   }
   else if ( e.data.msg === "pause" ) {
     m.pause();
@@ -38,7 +38,7 @@ PlatformBuilder.Agent.prototype.stop = function()
     this.planner.postMessage({msg:"stop"});
 }
 
-PlatformBuilder.Agent.createPlanner = function(m)
+PlatformBuilder.Agent.prototype.createPlanner = function(m)
 {
       var planner = new Worker("builder.js");
       planner.onmessage = function(e){
@@ -54,38 +54,36 @@ PlatformBuilder.Agent.createPlanner = function(m)
 		  planner.postMessage({msg:"continue",id:e.data.id,updateCountdown:m.updateCountdown});
 	  }
       };
-      return planner;
+      this.planner = planner;
 }
 
 PlatformBuilder.Manager = function(numAgents,width,height,depth)
 {
-    this.agents = Array(numAgents);
+    this.agents = [];
     this.world = PlatformBuilder.Manager.createWorld(width,height,depth)
 }
 
 PlatformBuilder.Manager.prototype.paused = false;
 
-PlatformBuilder.Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime)
+PlatformBuilder.Manager.run = function(agents,width,height,depth,updateCountdown,activityTime)
 {
-    m = new PlatformBuilder.Manager(numAgents,width,height,depth);
+    m = new PlatformBuilder.Manager(agents.length,width,height,depth);
     m.updateCountdown = updateCountdown;
     var origin;
     var goal;
-    for (var i=0;i<m.agents.length;i++)
+    for (var i=0;i<agents.length;i++)
     {
-	origin = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:Math.round(Math.random()*(m.world[0].length-1)),
-	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
-	m.world[origin.x][origin.y][origin.z]=3;
-	m.keepClear(origin.x,origin.y+1,origin.z);
-	m.keepClear(origin.x,origin.y+2,origin.z);
+	m.agents.push(new PlatformBuilder.Agent(i,agents[i].origin,agents[i].goal));
+
+	m.world[m.agents[i].origin.x][m.agents[i].origin.y][m.agents[i].origin.z]=3;
+	m.keepClear(m.agents[i].origin.x,m.agents[i].origin.y+1,m.agents[i].origin.z);
+	m.keepClear(m.agents[i].origin.x,m.agents[i].origin.y+2,m.agents[i].origin.z);
+
+	m.world[m.agents[i].goal.x][m.agents[i].goal.y][m.agents[i].goal.z] = 4;
+	m.keepClear(m.agents[i].goal.x,m.agents[i].goal.y+1,m.agents[i].goal.z);
+	m.keepClear(m.agents[i].goal.x,m.agents[i].goal.y+2,m.agents[i].goal.z);
 	
-	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:Math.round(Math.random()*(m.world[0].length-1)),
-	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
-	m.world[goal.x][goal.y][goal.z] = 4;
-	m.agents[i] = new PlatformBuilder.Agent(i,origin,goal);
-	m.agents[i].planner = PlatformBuilder.Agent.createPlanner(m);
+	m.agents[i].createPlanner(m);
 	m.agents[i].plan(m.world,updateCountdown);
     }
     postMessage({msg:"world",world:m.world});
