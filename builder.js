@@ -207,13 +207,13 @@ Builder.walkable = function(world,modifications,x,y,z)
     var floor = false;
     var headroom = true;
 
-    if (world[x][y][z]!=0)
+    if (world[x][y][z]>0)
 	floor = true;
     if (y+1<world[0].length)
-	if (world[x][y+1][z]!=0)
+	if (world[x][y+1][z]>0)
 	    headroom = false;
     if (y+2<world[0].length)  
-	if (world[x][y+2][z]!=0)
+	if (world[x][y+2][z]>0)
 	    headroom = false;
     if (!headroom)
 	return false;
@@ -269,7 +269,7 @@ Builder.moveBy = function(node,world,x,z,actionCode)
 	  n.push(node.state.e[i]);
       n.push([node.state.p.x+x,node.state.p.y,node.state.p.z+z]);
       n.push([node.state.p.x+x,node.state.p.y+2,node.state.p.z+z]);
-      n.push([node.state.p.x+x,node.state.p.y+2,node.state.p.z+z]);
+      n.push([node.state.p.x+x,node.state.p.y+3,node.state.p.z+z]);
       return new Builder.Node({p:p,m:node.state.m,e:n},node.cost+1,actionCode);
     }
     else if (Builder.walkable(world,node.state.m,node.state.p.x+x,node.state.p.y+1,node.state.p.z+z))

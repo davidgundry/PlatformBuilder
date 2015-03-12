@@ -123,8 +123,8 @@ Renderer.Renderer3D.prototype.init = function(world)
 {
     this.scene = new THREE.Scene();
     
-    var width = 400;
-    var height = 300;
+    var width = window.innerWidth;
+    var height = window.innerHeight*(3/4);
     var angle = 45;
     var aspectRatio = width / height;
     var near = 0.1;
@@ -190,13 +190,13 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
     for (var i=0;i<world.length;i++)
 	for (var j=0;j<world[0].length;j++)
 	  for (var k=0;k<world[0][0].length;k++)
-	    if (world[i][j][k] != 0)
+	    if (world[i][j][k] > 0)
 	    {
 	      switch (world[i][j][k])
 	      {
-		  case -1:
-		      cube = new THREE.Mesh(boxGeometry,headroomMaterials);
-		      break;
+		 // case -1:
+		  //    cube = new THREE.Mesh(boxGeometry,headroomMaterials);
+		 //     break;
 		  case 2:
 		      cube = new THREE.Mesh(boxGeometry,cubeMaterials);
 		      break;

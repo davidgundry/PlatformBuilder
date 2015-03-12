@@ -1,4 +1,4 @@
-function Core(width=10,height=5,depth=10,agents=5,updateCountdown=100,activityTime=10000000)
+function Core(width=10,height=10,depth=10,agents=5,updateCountdown=100,activityTime=10000000)
 {
     this.debug = true;
 
@@ -29,10 +29,10 @@ Core.prototype.pause = function()
 
 Core.prototype.run = function(canvas)
 {
-    var maxWidth = window.innerWidth;
-    var maxHeight = window.innerHeight;
-    maxWidth = Math.min(maxWidth,maxHeight)/2;
-    maxHeight = maxWidth;
+    //var maxWidth = window.innerWidth/2;
+    var maxHeight = window.innerHeight/4;
+    //maxWidth = Math.min(maxWidth,maxHeight);
+    var maxWidth = maxHeight;
     
     var blockWidth = Math.max(1,Math.floor(maxWidth/this.width));
     var blockHeight = Math.max(1,Math.floor(maxHeight/this.depth));
