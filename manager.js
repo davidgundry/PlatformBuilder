@@ -246,13 +246,13 @@ Manager.walkable = function(world,x,y,z)
     var floor = false;
     var headroom = true;
 
-    if (world[x][y][z]!=0)
+    if (world[x][y][z]>0)
 	floor = true;
     if (y+1<world[0].length)
-	if (world[x][y+1][z]!=0)
+	if (world[x][y+1][z]>0)
 	    headroom = false;
     if (y+2<world[0].length)  
-	if (world[x][y+2][z]!=0)
+	if (world[x][y+2][z]>0)
 	    headroom = false;
 	
     return (floor && headroom);
@@ -347,7 +347,17 @@ Manager.prototype.moveBy = function(agentID,x,z)
     }
     else
       return false;
+    this.keepClear(x,this.agents[agentID].position.y+1,z);
+    this.keepClear(x,this.agents[agentID].position.y+2,z);
     return true;
+}
+
+Manager.prototype.keepClear = function(x,y,z)
+{
+    if (Manager.inWorldBounds(x,y,z,this.world))
+    {
+	this.world[x][y][z] = -1;
+    }
 }
 
 Manager.prototype.buildDirection = function(agentID,x,y,z)
