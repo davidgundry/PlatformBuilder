@@ -66,7 +66,6 @@ Manager.run = function(numAgents,width,height,depth,updateCountdown,activityTime
 {
     m = new Manager(numAgents,width,height,depth);
     m.updateCountdown = updateCountdown;
-    var builder;
     var origin;
     var goal;
     for (var i=0;i<m.agents.length;i++)
