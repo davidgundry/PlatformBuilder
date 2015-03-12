@@ -1,6 +1,6 @@
 function PlatformBuilder(){}
 
-PlatformBuilder.debug = 1;
+PlatformBuilder.debug = 0;
 
 PlatformBuilder.CoreAgent = function(origin,goal)
 {

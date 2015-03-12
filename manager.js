@@ -1,6 +1,6 @@
 function PlatformBuilder(){}
 
-PlatformBuilder.debug = 2;
+PlatformBuilder.debug = 0;
 var m = null;
 
 onmessage = function(e){

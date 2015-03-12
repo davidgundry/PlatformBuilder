@@ -12,7 +12,7 @@ PlatformBuilder.Path.prototype.complete = false;
 
 PlatformBuilder.Renderer.Renderer2D = function(canvas,width,height,depth)
 {
-    var maxWidth = 187;
+    var maxWidth = 180;
     
     this.blockWidth = Math.max(1,Math.floor(maxWidth/width));
     this.blockHeight = this.blockWidth;
@@ -123,8 +123,12 @@ PlatformBuilder.Renderer.Renderer3D = function(container)
     this.renderer = null;
     this.controls = null;
     
-    var width = 1000;
-    var height = window.innerHeight-30;
+    this.boxHeight = 2;
+    this.boxWidth = 5;
+    this.boxDepth = 5;
+    
+    var width = window.innerWidth;
+    var height = window.innerHeight;
     this.aspectRatio = width / height;
     this.renderer = new THREE.WebGLRenderer({antialias:true});
     this.renderer.setSize(width, height);
@@ -143,8 +147,8 @@ PlatformBuilder.Renderer.Renderer3D.prototype.init = function(world)
     
     this.camera = new THREE.PerspectiveCamera(angle, this.aspectRatio, near, far);
     this.scene.add(this.camera);
-    this.camera.position.set(0,200,0);
-    this.camera.lookAt(this.scene.position);	
+    this.camera.position.set(world.length*this.boxWidth/2,world[0].length*this.boxHeight+30,-30);
+    this.camera.lookAt(new THREE.Vector3(world.length*this.boxWidth/2,world[0].length*this.boxHeight/2,world[0][0].length*this.boxDepth/2));	
     
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 
@@ -189,7 +193,7 @@ PlatformBuilder.Renderer.Renderer3D.prototype.createWorld = function(world)
     originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x66ff00 } ) );
     originMaterialArray.push( new THREE.MeshBasicMaterial( { color: 0x00ff66 } ) );
     var originMaterials = new THREE.MeshFaceMaterial(originMaterialArray);
-    var boxGeometry = new THREE.BoxGeometry( 5, 2, 5, 1, 1, 1 );
+    var boxGeometry = new THREE.BoxGeometry( this.boxWidth, this.boxHeight, this.boxDepth, 1, 1, 1 );
 
     var cube = null;
     
@@ -213,7 +217,7 @@ PlatformBuilder.Renderer.Renderer3D.prototype.createWorld = function(world)
 		      cube = new THREE.Mesh(boxGeometry,goalMaterials);
 		      break;
 	      }
-	      cube.position.set(5*i, 2*j, 5*k);
+	      cube.position.set(this.boxWidth*i, this.boxHeight*j, this.boxDepth*k);
 	      this.scene.add(cube);
 	    }
 }
