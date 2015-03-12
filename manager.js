@@ -5,7 +5,7 @@ var m = null;
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-    PlatformBuilder.Manager.run(e.data.agents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime);
+    PlatformBuilder.Manager.run(e.data.agents,e.data.width,e.data.height,e.data.depth,e.data.updateCountdown,e.data.activityTime,e.data.costWeight,e.data.heuristicWeight);
   }
   else if ( e.data.msg === "pause" ) {
     m.pause();
@@ -26,11 +26,11 @@ PlatformBuilder.Agent.prototype.complete = false;
 PlatformBuilder.Agent.prototype.planner = null;
 PlatformBuilder.Agent.prototype.candidate = null;
 
-PlatformBuilder.Agent.prototype.plan = function(world,updateCountdown)
+PlatformBuilder.Agent.prototype.plan = function(world,updateCountdown,costWeight,heuristicWeight)
 {
     if (PlatformBuilder.debug>1)
 	console.log("Agent " + this.id + " starting planner");
-    this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown});
+    this.planner.postMessage({msg:"start",id:this.id,world:world,origin:this.position,goal:this.goal,updateCountdown:updateCountdown,costWeight:costWeight,heuristicWeight:heuristicWeight});
 }
 
 PlatformBuilder.Agent.prototype.stop = function()
@@ -57,17 +57,19 @@ PlatformBuilder.Agent.prototype.createPlanner = function(m)
       this.planner = planner;
 }
 
-PlatformBuilder.Manager = function(numAgents,width,height,depth)
+PlatformBuilder.Manager = function(numAgents,width,height,depth,costWeight,heuristicWeight)
 {
     this.agents = [];
-    this.world = PlatformBuilder.Manager.createWorld(width,height,depth)
+    this.world = PlatformBuilder.Manager.createWorld(width,height,depth);
+    this.costWeight = costWeight;
+    this.heuristicWeight = heuristicWeight;
 }
 
 PlatformBuilder.Manager.prototype.paused = false;
 
-PlatformBuilder.Manager.run = function(agents,width,height,depth,updateCountdown,activityTime)
+PlatformBuilder.Manager.run = function(agents,width,height,depth,updateCountdown,activityTime,costWeight,heuristicWeight)
 {
-    m = new PlatformBuilder.Manager(agents.length,width,height,depth);
+    m = new PlatformBuilder.Manager(agents.length,width,height,depth,costWeight,heuristicWeight);
     m.updateCountdown = updateCountdown;
     var origin;
     var goal;
@@ -84,7 +86,7 @@ PlatformBuilder.Manager.run = function(agents,width,height,depth,updateCountdown
 	m.keepClear(m.agents[i].goal.x,m.agents[i].goal.y+2,m.agents[i].goal.z);
 	
 	m.agents[i].createPlanner(m);
-	m.agents[i].plan(m.world,updateCountdown);
+	m.agents[i].plan(m.world,updateCountdown,costWeight,heuristicWeight);
     }
     postMessage({msg:"world",world:m.world});
     setInterval(function() {
@@ -106,7 +108,7 @@ PlatformBuilder.Manager.prototype.rePlanAgents = function()
 	if (this.agents[i].candidate == null)
 	{
 	    this.agents[i].complete = false;
-	    this.agents[i].plan(this.world,this.updateCountdown);
+	    this.agents[i].plan(this.world,this.updateCountdown,this.costWeight,this.heuristicWeight);
 	    if (PlatformBuilder.debug>1)
 		console.log("Started replanning agent "+i);
 	}
@@ -116,7 +118,7 @@ PlatformBuilder.Manager.prototype.rePlanAgents = function()
 		//this.agents[i].planner.terminate();  
 	    //this.agents[i].planner = PlatformBuilder.Agent.createPlanner(this);
 	    this.agents[i].candidate = null;
-	    this.agents[i].plan(this.world,this.updateCountdown);
+	    this.agents[i].plan(this.world,this.updateCountdown,this.costWeight,this.heuristicWeight);
 	    if (PlatformBuilder.debug>1)
 		console.log("Continued planning agent "+i);
 	}

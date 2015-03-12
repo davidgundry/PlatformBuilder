@@ -8,13 +8,15 @@ PlatformBuilder.CoreAgent = function(origin,goal)
     this.goal = goal;
 }
 
-PlatformBuilder.Core = function(width,height,depth,updateCountdown,activityTime,canvas,container)
+PlatformBuilder.Core = function(width,height,depth,updateCountdown,activityTime,costWeight,heuristicWeight,canvas,container)
 {
     this.debug = true;
 
     this.width = width;
     this.height = height;
     this.depth = depth;
+    this.costWeight = costWeight;
+    this.heuristicWeight = heuristicWeight;
     /**
      * Planners should send their current best solution every this many steps
      */
@@ -88,7 +90,7 @@ PlatformBuilder.Core.prototype.run = function(agents)
 	}
     };
     
-    this.manager.postMessage({msg:"start",agents:agents,width:this.width,height:this.height,depth:this.depth,updateCountdown:this.updateCountdown,activityTime:this.activityTime});
+    this.manager.postMessage({msg:"start",agents:agents,width:this.width,height:this.height,depth:this.depth,updateCountdown:this.updateCountdown,activityTime:this.activityTime,costWeight:this.costWeight,heuristicWeight:this.heuristicWeight});
     
     if (PlatformBuilder.debug>1)
       console.log("Started Manager");

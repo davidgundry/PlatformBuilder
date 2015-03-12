@@ -35,7 +35,7 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
     for (var j=0;j<data[0].length;j++)
     {
 	this.context.fillStyle = "#fee";    
-	this.context.fillRect(0, this.mapWidth*j, this.blockWidth*data.length, this.blockHeight*data[0].length);
+	this.context.fillRect(0, this.mapWidth*j, this.blockWidth*data.length, this.blockHeight*data[0][0].length);
 	
 	for (var i=0;i<data.length;i++)
 	{

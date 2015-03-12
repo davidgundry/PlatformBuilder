@@ -8,7 +8,7 @@ onmessage = function(e){
   if ( e.data.msg === "start" ) {
         if (PlatformBuilder.debug>2)
 	console.log("Builder id " + e.data.id + " recieved start message");
-    builder = new PlatformBuilder.Builder(e.data.world,e.data.origin,e.data.goal);
+    builder = new PlatformBuilder.Builder(e.data.world,e.data.origin,e.data.goal,e.data.costWeight,e.data.heuristicWeight);
     PlatformBuilder.Builder.run(e.data.id,e.data.updateCountdown);
   } 
   else if ( e.data.msg === "continue" ) {
@@ -19,12 +19,15 @@ onmessage = function(e){
   }
 };
 
-PlatformBuilder.Builder = function(world,origin,goal)
+PlatformBuilder.Builder = function(world,origin,goal,costWeight,heuristicWeight)
 {
   if (PlatformBuilder.debug > 0)
       this.time = performance.now();
   this.world = world;
   this.goal = goal;
+  
+  this.costWeight = costWeight;
+  this.heuristicWeight = heuristicWeight;
 
 
   if (!PlatformBuilder.Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (PlatformBuilder.debug>0))
@@ -37,8 +40,6 @@ PlatformBuilder.Builder = function(world,origin,goal)
   this.currentNode = this.fringe[0];
 }
 
-PlatformBuilder.Builder.costWeight = 0.3;
-PlatformBuilder.Builder.heuristicWeight = 0.7;
 PlatformBuilder.Builder.buildCost = 3;
 
 PlatformBuilder.Builder.prototype.stepNo = 0;
@@ -113,7 +114,7 @@ PlatformBuilder.Builder.prototype.step = function()
 	var newNodes = PlatformBuilder.Builder.expand(this.currentNode,PlatformBuilder.Builder.actions,this.goal,this.world);
 	for (var i=newNodes.length-1;i>=0;i--)
 	{
-	  newNodes[i].heuristic = PlatformBuilder.Builder.costWeight*newNodes[i].cost + PlatformBuilder.Builder.heuristicWeight*PlatformBuilder.Builder.heuristic(newNodes[i].state,this.goal);
+	  newNodes[i].heuristic = this.costWeight*newNodes[i].cost + this.heuristicWeight*PlatformBuilder.Builder.heuristic(newNodes[i].state,this.goal);
 	  newNodes[i].parent = this.closedList[this.closedList.length-1];
 	  for (var j=this.closedList.length-1;j>=0;j--)
 	  {
