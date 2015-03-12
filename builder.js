@@ -363,6 +363,26 @@ PlatformBuilder.Builder.buildStepLeft = function(node,world)
     return PlatformBuilder.Builder.buildDirection(node,world,-1,1,0,11);
 }
 
+PlatformBuilder.Builder.buildDropUp = function(node,world)
+{
+    return PlatformBuilder.Builder.buildDirection(node,world,0,-1,-1,12);
+}
+
+PlatformBuilder.Builder.buildDropRight = function(node,world)
+{
+    return PlatformBuilder.Builder.buildDirection(node,world,1,-1,0,13);
+}
+
+PlatformBuilder.Builder.buildDropDown = function(node,world)
+{
+    return PlatformBuilder.Builder.buildDirection(node,world,0,-1,1,14);
+}
+
+PlatformBuilder.Builder.buildDropLeft = function(node,world)
+{
+    return PlatformBuilder.Builder.buildDirection(node,world,-1,-1,0,15);
+}
+
 /**
  * moveUp = 0
  * moveRight = 1
@@ -376,8 +396,12 @@ PlatformBuilder.Builder.buildStepLeft = function(node,world)
  * buildStepRight = 9
  * buildStepDown = 10
  * buildStepLeft = 11
+ * buildDropUp = 8
+ * buildDropRight = 9
+ * buildDropDown = 10
+ * buildDropLeft = 11
  */
-PlatformBuilder.Builder.actions = [PlatformBuilder.Builder.moveRight,PlatformBuilder.Builder.moveLeft,PlatformBuilder.Builder.moveUp,PlatformBuilder.Builder.moveDown,PlatformBuilder.Builder.buildRight,PlatformBuilder.Builder.buildLeft,PlatformBuilder.Builder.buildUp,PlatformBuilder.Builder.buildDown,PlatformBuilder.Builder.buildStepRight,PlatformBuilder.Builder.buildStepLeft,PlatformBuilder.Builder.buildStepUp,PlatformBuilder.Builder.buildStepDown];
+PlatformBuilder.Builder.actions = [PlatformBuilder.Builder.moveRight,PlatformBuilder.Builder.moveLeft,PlatformBuilder.Builder.moveUp,PlatformBuilder.Builder.moveDown,PlatformBuilder.Builder.buildRight,PlatformBuilder.Builder.buildLeft,PlatformBuilder.Builder.buildUp,PlatformBuilder.Builder.buildDown,PlatformBuilder.Builder.buildStepRight,PlatformBuilder.Builder.buildStepLeft,PlatformBuilder.Builder.buildStepUp,PlatformBuilder.Builder.buildStepDown,PlatformBuilder.Builder.buildDropRight,PlatformBuilder.Builder.buildDropLeft,PlatformBuilder.Builder.buildDropUp,PlatformBuilder.Builder.buildDropDown];
 
 
 PlatformBuilder.Builder.prototype.summary = function(solution,steps,time)

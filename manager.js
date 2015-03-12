@@ -74,14 +74,14 @@ PlatformBuilder.Manager.run = function(numAgents,width,height,depth,updateCountd
     for (var i=0;i<m.agents.length;i++)
     {
 	origin = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:0,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[origin.x][origin.y][origin.z]=3;
 	m.keepClear(origin.x,origin.y+1,origin.z);
 	m.keepClear(origin.x,origin.y+2,origin.z);
 	
 	goal = {x:Math.round(Math.random()*(m.world.length-1)),
-	  y:9,//Math.round(Math.random()*(m.world[0].length-1)),
+	  y:Math.round(Math.random()*(m.world[0].length-1)),
 	  z:Math.round(Math.random()*(m.world[0][0].length-1))};
 	m.world[goal.x][goal.y][goal.z] = 4;
 	m.agents[i] = new PlatformBuilder.Agent(i,origin,goal);
@@ -327,6 +327,22 @@ PlatformBuilder.Manager.prototype.action = function(actionID,agentID)
 	    if (!this.buildStepLeft(agentID))
 	      return false;
 	    break;
+	case 12:
+	    if (!this.buildDropUp(agentID))
+	      return false;
+	    break;
+	case 13:
+	    if (!this.buildDropRight(agentID))
+	      return false;
+	    break;
+	case 14:
+	    if (!this.buildDropDown(agentID))
+	      return false;
+	    break;
+	case 15:
+	    if (!this.buildDropLeft(agentID))
+	      return false;
+	    break;
     }
     return true;
 }
@@ -433,4 +449,24 @@ PlatformBuilder.Manager.prototype.buildStepDown = function(agentID)
 PlatformBuilder.Manager.prototype.buildStepLeft = function(agentID)
 {
     return this.buildDirection(agentID,-1,1,0);
+}
+
+PlatformBuilder.Manager.prototype.buildDropUp = function(agentID)
+{
+    return this.buildDirection(agentID,0,-1,-1);
+}
+
+PlatformBuilder.Manager.prototype.buildDropRight = function(agentID)
+{
+    return this.buildDirection(agentID,1,-1,0);
+}
+
+PlatformBuilder.Manager.prototype.buildDropDown = function(agentID)
+{
+    return this.buildDirection(agentID,0,-1,1);
+}
+
+PlatformBuilder.Manager.prototype.buildDropLeft = function(agentID)
+{
+    return this.buildDirection(agentID,-1,-1,0);
 }
