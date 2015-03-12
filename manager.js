@@ -347,8 +347,8 @@ Manager.prototype.moveBy = function(agentID,x,z)
     }
     else
       return false;
-    this.keepClear(x,this.agents[agentID].position.y+1,z);
-    this.keepClear(x,this.agents[agentID].position.y+2,z);
+    this.keepClear(this.agents[agentID].position.x,this.agents[agentID].position.y+1,this.agents[agentID].position.z);
+    this.keepClear(this.agents[agentID].position.x,this.agents[agentID].position.y+2,this.agents[agentID].position.z);
     return true;
 }
 

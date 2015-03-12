@@ -185,6 +185,9 @@ Renderer.Renderer3D.prototype.createWorld = function(world)
 	    {
 	      switch (world[i][j][k])
 	      {
+		  case -1:
+		      cube = new THREE.Mesh(boxGeometry,goalMaterials);
+		      break;
 		  case 2:
 		      cube = new THREE.Mesh(boxGeometry,cubeMaterials);
 		      break;
