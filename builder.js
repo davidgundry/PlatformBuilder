@@ -1,11 +1,11 @@
 function PlatformBuilder(){};
 
-var debug = 1;
+PlatformBuilder.debug = 1;
 var builder = null
 
 onmessage = function(e){
   if ( e.data.msg === "start" ) {
-        if (debug>2)
+        if (PlatformBuilder.debug>2)
 	console.log("Builder id " + e.data.id + " recieved start message");
     builder = new PlatformBuilder.Builder(e.data.world,e.data.origin,e.data.goal);
     PlatformBuilder.Builder.run(e.data.id,e.data.updateCountdown);
@@ -20,15 +20,15 @@ onmessage = function(e){
 
 PlatformBuilder.Builder = function(world,origin,goal)
 {
-  if (debug > 0)
+  if (PlatformBuilder.debug > 0)
       this.time = performance.now();
   this.world = world;
   this.goal = goal;
 
 
-  if (!PlatformBuilder.Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (debug>0))
+  if (!PlatformBuilder.Builder.inWorldBounds(origin.x,origin.y,origin.z,world) && (PlatformBuilder.debug>0))
     console.log("ERROR: Origin " + origin.x +", "+origin.y +", "+origin.z + " not in world bounds.");
-  if (!PlatformBuilder.Builder.inWorldBounds(goal.x,goal.y,goal.z,world) && (debug>0))
+  if (!PlatformBuilder.Builder.inWorldBounds(goal.x,goal.y,goal.z,world) && (PlatformBuilder.debug>0))
     console.log("ERROR: Goal " + goal.x +", "+goal.y +", "+goal.z + " not in world bounds.");
   
   this.fringe = [new PlatformBuilder.Builder.Node({p:origin,m:[],e:[]},0,null)];
@@ -46,7 +46,7 @@ PlatformBuilder.Builder.inWorldBounds = function(x,y,z,world)
 
 PlatformBuilder.Builder.run = function(id,updateCountdown)
 {
-    if (debug>2)
+    if (PlatformBuilder.debug>2)
 	console.log("Builder started on id " + id);
     var countdown = updateCountdown;
     while (countdown >= 0)
@@ -67,7 +67,7 @@ PlatformBuilder.Builder.run = function(id,updateCountdown)
     
     if (PlatformBuilder.Builder.goalTest(builder.currentNode.state,builder.goal))
     {
-	if (debug>0)
+	if (PlatformBuilder.debug>0)
 	{
 	    builder.time = performance.now()-builder.time;
 	    builder.summary(builder.currentNode,builder.stepNo,builder.time);
@@ -95,14 +95,14 @@ PlatformBuilder.Builder.createCandidate = function(currentNode,closedList)
 
 PlatformBuilder.Builder.prototype.step = function()
 {
-    if (debug>1)
+    if (PlatformBuilder.debug>1)
 	console.log("Fringe length: "+this.fringe.length);
     
     if (this.currentNode != null)
     {
 	if (PlatformBuilder.Builder.goalTest(builder.currentNode.state,builder.goal))
 	    return false;
-	if (debug>1)
+	if (PlatformBuilder.debug>1)
 	    console.log("p: "+this.currentNode.state.p.x+","+this.currentNode.state.p.y + ","+this.currentNode.state.p.z + " h: "+this.currentNode.heuristic + " m: "+this.currentNode.state.m.length + " e: "+this.currentNode.state.e.length);
 	this.fringe.splice(this.fringe.indexOf(this.currentNode),1);
 	this.closedList.push(this.currentNode);
@@ -166,7 +166,7 @@ PlatformBuilder.Builder.expand = function(node,actions,goal,world)
 	    children.push(child);
 	}
     }
-    if (debug>1)
+    if (PlatformBuilder.debug>1)
 	console.log("Added "+children.length+" nodes");
     return children;
 }

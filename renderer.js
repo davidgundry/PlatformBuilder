@@ -1,4 +1,3 @@
-var debug = 0;	
 PlatformBuilder.Renderer = function(){}
 
 PlatformBuilder.Path = function(offsetX,offsetY)
@@ -59,7 +58,7 @@ PlatformBuilder.Renderer.Renderer2D.prototype.renderWorld = function(data)
 	    }
 	}
     }
-    if (debug>0)
+    if (PlatformBuilder.debug>0)
 	console.log("Rendering finished");
 }
 
