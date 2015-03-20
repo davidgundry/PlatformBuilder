@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<meta charset="utf-8" />
+	<title>Builder</title>
+	<script type="text/javascript" src="core.js"></script>
+	<script type="text/javascript" src="renderer.js"></script>
+	<script src="three/three.min.js"></script>
+	<script src="three/OrbitControls.js"></script>
+    </head>
+
+    <body style="margin:0; background-color:#333; overflow:hidden;">
+	<div style="color: white; font-size: 10pt; position: absolute; top:0 ;right:0;width:200px; height:100%;z-index: 2;">
+	    <input type="submit" value="Pause/Unpause" onClick="pause()" />
+	    <br />Agents: <input id="numAgents" type="number" value="1" min="1" />
+	    <br />Width: <input id="width" type="number" value="5" min="1" />
+	    <br />Height: <input id="height" type="number" value="5" min="1" />
+	    <br />Depth: <input id="depth" type="number" value="5" min="1" />
+	    <br />Cost Weight: <input id="costWeight" type="number" value="0.3" min="0" max="1" step="any"/>
+	    <br />Heuristic Weight: <input id="heuristicWeight" type="number" value="0.7" min="0" max="1" step="any" />
+	    <br />Update Countdown: <input id="updateCountdown" type="number" value="200" min="1" />
+	    <br />Activity Time: <input id="activityTime" type="number" value="3000" min="1" />
+	</div>
+	<div style="opacity: 0.5;position: absolute; top:0;left:0; overflow:auto; width:200px; height:100%;z-index: 1;">
+	    <canvas id="2DTarget" ></canvas>
+	</div>
+	<div id="3DTarget" style="position: absolute; top:0;left:0; z-index: -1;"></div>
+	<script type="text/javascript">
+	    var width=document.getElementById("width").value;
+	    var height=document.getElementById("height").value;
+	    var depth=document.getElementById("depth").value
+	    var updateCountdown=document.getElementById("updateCountdown").value;
+	    var activityTime=document.getElementById("activityTime").value;
+	    var costWeight = document.getElementById("costWeight").value;
+	    var heuristicWeight = document.getElementById("heuristicWeight").value;
+	    var c = new PlatformBuilder.Core(width,height,depth,updateCountdown,activityTime,costWeight,heuristicWeight,document.getElementById("2DTarget"),document.getElementById('3DTarget'));
+	    
+	    var agents = [];
+	    var goal, origin;
+	    for (var i=0;i<document.getElementById("numAgents").value;i++)
+	    {
+	    	goal = {x:Math.round(Math.random()*(width-1)),
+		    y:Math.round(Math.random()*(height-1)),
+		  z:Math.round(Math.random()*(depth-1))};
+		origin = {x:Math.round(Math.random()*(width-1)),
+		    y:Math.round(Math.random()*(height-1)),
+		    z:Math.round(Math.random()*(depth-1))};
+		agents.push(new PlatformBuilder.CoreAgent(origin,goal))
+	      }
+	    c.run(agents);
+	    function pause(){c.pause()};
+	</script>
+    </body>
+</html>
